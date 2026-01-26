@@ -1,0 +1,217 @@
+.patient-deck {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.deck-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.deck-header h3 {
+  font-size: 1.2rem;
+  color: var(--text-primary);
+}
+
+.deck-header p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.scheduling-hint {
+  background: rgba(225, 112, 85, 0.1);
+  border: 1px dashed var(--accent-coral);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--accent-coral);
+}
+
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.patient-card {
+  background: white;
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  cursor: pointer;
+  border-left: 4px solid;
+  box-shadow: var(--shadow-sm);
+}
+
+.patient-card:hover {
+  box-shadow: var(--shadow-md);
+}
+.patient-card.active {
+  box-shadow: var(--shadow-lg);
+}
+.patient-card.urgency-high {
+  border-color: var(--urgency-high);
+}
+.patient-card.urgency-medium {
+  border-color: var(--urgency-medium);
+}
+.patient-card.urgency-low {
+  border-color: var(--urgency-low);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.patient-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent-teal);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.patient-info {
+  flex: 1;
+}
+.patient-name {
+  font-weight: 600;
+}
+.patient-age {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.urgency-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.patient-card.urgency-high .urgency-badge {
+  background: rgba(214, 48, 49, 0.1);
+  color: var(--urgency-high);
+}
+.patient-card.urgency-medium .urgency-badge {
+  background: rgba(225, 112, 85, 0.1);
+  color: var(--urgency-medium);
+}
+.patient-card.urgency-low .urgency-badge {
+  background: rgba(0, 184, 148, 0.1);
+  color: var(--urgency-low);
+}
+
+.card-body {
+  padding: 0.75rem 0;
+  border-top: 1px solid #eee;
+  font-size: 0.85rem;
+}
+
+.card-body .label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.card-footer {
+  padding-top: 0.75rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.tap-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.cancel-btn,
+.schedule-btn {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: transparent;
+  border: 1px solid #ddd;
+  color: var(--text-secondary);
+}
+
+.schedule-btn {
+  background: var(--accent-teal);
+  border: none;
+  color: white;
+  font-weight: 600;
+}
+
+.empty-deck {
+  text-align: center;
+  padding: 2rem;
+  color: var(--urgency-low);
+}
+
+.empty-deck .empty-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.deck-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legend-item .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.legend-item .dot.high {
+  background: var(--urgency-high);
+}
+.legend-item .dot.medium {
+  background: var(--urgency-medium);
+}
+.legend-item .dot.low {
+  background: var(--urgency-low);
+}
