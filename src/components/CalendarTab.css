@@ -15,7 +15,7 @@
 .section-header {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .section-header h2 {
@@ -32,7 +32,7 @@
 .calendar-container {
   border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid #eee;
+  border: 1px solid var(--border-light);
 }
 
 .calendar-header {
@@ -57,6 +57,7 @@
   color: white;
   border-radius: 50%;
   cursor: pointer;
+  transition: background var(--transition-fast);
 }
 
 .nav-button:hover {
@@ -93,16 +94,18 @@
   border-right: 1px solid #f0f0f0;
   border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
+  transition: background var(--transition-fast);
 }
 
 .calendar-cell:nth-child(7n) {
   border-right: none;
 }
-.calendar-cell:hover:not(.disabled) {
+.calendar-cell:hover:not(.disabled):not(.past-date):not(.booking-horizon) {
   background: rgba(30, 107, 92, 0.05);
 }
+
 .calendar-cell.disabled {
-  background: #fafafa;
+  background: var(--bg-muted);
   cursor: default;
 }
 .calendar-cell.disabled .day-number {
@@ -120,6 +123,36 @@
   outline-offset: -2px;
 }
 
+.calendar-cell.full {
+  background: rgba(214, 48, 49, 0.05);
+  cursor: not-allowed;
+}
+.calendar-cell.full:hover {
+  background: rgba(214, 48, 49, 0.05);
+}
+
+.calendar-cell.past-date {
+  background: var(--bg-muted);
+  cursor: not-allowed;
+}
+.calendar-cell.past-date:hover {
+  background: var(--bg-muted);
+}
+.calendar-cell.past-date .day-number {
+  color: #ccc;
+}
+
+.calendar-cell.booking-horizon {
+  background: repeating-linear-gradient(45deg, #fff8f0, #fff8f0 4px, #ffefdf 4px, #ffefdf 8px);
+  cursor: not-allowed;
+}
+.calendar-cell.booking-horizon:hover {
+  background: repeating-linear-gradient(45deg, #fff8f0, #fff8f0 4px, #ffefdf 4px, #ffefdf 8px);
+}
+.calendar-cell.booking-horizon .day-number {
+  color: var(--accent-coral);
+}
+
 .day-number {
   display: inline-flex;
   align-items: center;
@@ -128,6 +161,22 @@
   height: 26px;
   font-size: 0.85rem;
   border-radius: 50%;
+}
+
+.full-indicator,
+.horizon-indicator {
+  display: block;
+  font-size: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.full-indicator {
+  color: var(--urgency-high);
+}
+.horizon-indicator {
+  color: var(--accent-coral);
 }
 
 .appointments-container {
@@ -160,26 +209,31 @@
   color: #00866f;
 }
 
-.selected-date-info {
+.more-appointments {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.55rem;
+  font-weight: 600;
+  background: #f0f0f0;
+  color: var(--text-secondary);
+}
+
+.calendar-scheduling-hint {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: center;
+  gap: 0.5rem;
   margin-top: 1rem;
   padding: 1rem;
-  background: rgba(30, 107, 92, 0.05);
+  background: rgba(225, 112, 85, 0.1);
+  border: 1px dashed var(--accent-coral);
   border-radius: var(--radius-md);
-  border-left: 4px solid var(--accent-teal);
+  color: var(--accent-coral);
+  font-size: 0.9rem;
 }
 
-.date-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--accent-teal);
-  text-transform: uppercase;
-}
-
-.date-value {
-  font-size: 1rem;
+.calendar-scheduling-hint .hint-icon {
+  font-size: 1.25rem;
 }
 
 .deck-section {

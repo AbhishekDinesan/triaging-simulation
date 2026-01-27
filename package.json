@@ -27,8 +27,10 @@
   "dependencies": {
     "@vitejs/plugin-react": "^5.1.2",
     "date-fns": "^4.1.0",
+    "firebase": "^12.8.0",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^7.13.0"
   },
   "lint-staged": {
     "*.{js,jsx}": [

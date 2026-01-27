@@ -1,59 +1,85 @@
-import { useState } from 'react'
-import CalendarTab from './components/CalendarTab'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider, useAuthContext } from './context/AuthContext'
+import { SimulationSettingsProvider } from './context/SimulationSettingsContext'
+import LoginPage from './pages/LoginPage'
+import StudentPage from './pages/StudentPage'
+import InstructorDashboard from './pages/InstructorDashboard'
 import './App.css'
 
-const TABS = [
-  { id: 'calendar', label: 'Patient Scheduling', icon: '📅' },
-  { id: 'triage', label: 'Add Feature', icon: '🏥' },
-  { id: 'cases', label: 'Add Feature', icon: '📋' },
-]
+function ProtectedRoute({ children, allowedRole }) {
+  const { currentUser, userRole, authLoading } = useAuthContext()
 
-function App() {
-  const [activeTab, setActiveTab] = useState('calendar')
+  if (authLoading) {
+    return (
+      <div className="auth-loading-screen">
+        <span className="auth-loading-icon">🩺</span>
+        <p>Loading...</p>
+      </div>
+    )
+  }
+
+  if (!currentUser) {
+    return <Navigate to="/" replace />
+  }
+
+  if (allowedRole && userRole !== allowedRole) {
+    const redirectPath = userRole === 'instructor' ? '/instructor' : '/student'
+    return <Navigate to={redirectPath} replace />
+  }
+
+  return children
+}
+
+function AppRoutes() {
+  const { currentUser, userRole, authLoading } = useAuthContext()
+
+  if (authLoading) {
+    return (
+      <div className="auth-loading-screen">
+        <span className="auth-loading-icon">🩺</span>
+        <p>Loading...</p>
+      </div>
+    )
+  }
 
   return (
-    <div className="app">
-      <header className="header">
-        <div className="header-content">
-          <div className="logo">
-            <span className="logo-icon">🩺</span>
-            <div className="logo-text">
-              <h1>Simulation</h1>
-              <span className="logo-subtitle">Triaging Simulation</span>
-            </div>
-          </div>
-          <nav className="nav">
-            {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                className={`nav-tab ${activeTab === tab.id ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                <span className="tab-icon">{tab.icon}</span>
-                <span className="tab-label">{tab.label}</span>
-              </button>
-            ))}
-          </nav>
-        </div>
-      </header>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          currentUser ? <Navigate to={userRole === 'instructor' ? '/instructor' : '/student'} replace /> : <LoginPage />
+        }
+      />
+      <Route
+        path="/student"
+        element={
+          <ProtectedRoute allowedRole="student">
+            <StudentPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/instructor"
+        element={
+          <ProtectedRoute allowedRole="instructor">
+            <InstructorDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  )
+}
 
-      <main className="main">
-        {activeTab === 'calendar' && <CalendarTab />}
-        {activeTab !== 'calendar' && (
-          <div className="coming-soon">
-            <div className="coming-soon-content">
-              <span className="coming-soon-icon">{TABS.find((t) => t.id === activeTab)?.icon}</span>
-              <h2>Add Feature</h2>
-              <p>Coming soon...</p>
-            </div>
-          </div>
-        )}
-      </main>
-
-      <footer className="footer">
-        <p>University of Waterloo</p>
-      </footer>
-    </div>
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <SimulationSettingsProvider>
+          <AppRoutes />
+        </SimulationSettingsProvider>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
 

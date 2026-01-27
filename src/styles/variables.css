@@ -1,0 +1,44 @@
+:root {
+  --bg-primary: #f5f5f5;
+  --bg-secondary: #fff;
+  --bg-card: #fff;
+  --bg-muted: #f8f9fa;
+
+  --text-primary: #2d3436;
+  --text-secondary: #636e72;
+  --text-muted: #b2bec3;
+
+  --accent-teal: #1e6b5c;
+  --accent-teal-light: #2d8b76;
+  --accent-coral: #e17055;
+
+  --urgency-high: #d63031;
+  --urgency-high-light: #ff7675;
+  --urgency-high-bg: rgba(214, 48, 49, 0.1);
+  --urgency-medium: #e17055;
+  --urgency-medium-light: #fab1a0;
+  --urgency-medium-bg: rgba(225, 112, 85, 0.1);
+  --urgency-low: #00b894;
+  --urgency-low-light: #55efc4;
+  --urgency-low-bg: rgba(0, 184, 148, 0.1);
+
+  --border-light: #eee;
+  --border-medium: #e0e0e0;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+
+  --max-width: 1400px;
+  --header-height: 70px;
+}

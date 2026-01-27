@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   format,
   startOfMonth,
@@ -8,82 +8,74 @@ import {
   addDays,
   isSameMonth,
   isSameDay,
+  isBefore,
+  startOfDay,
   addMonths,
   subMonths,
 } from 'date-fns'
+import { useSimulationSettings } from '../context/SimulationSettingsContext'
 import PatientCardDeck from './PatientCardDeck'
+import DailyScheduleView from './DailyScheduleView'
 import './CalendarTab.css'
 
-const initialPatients = [
-  {
-    id: 1,
-    name: 'Eleanor Vance',
-    age: 67,
-    condition: 'Cardiac Evaluation',
-    urgency: 'high',
-    symptoms: 'Chest pain, shortness of breath',
-  },
-  {
-    id: 2,
-    name: 'Marcus Chen',
-    age: 34,
-    condition: 'Follow-up: Fracture',
-    urgency: 'medium',
-    symptoms: 'Wrist pain after cast removal',
-  },
-  {
-    id: 3,
-    name: 'Sarah Mitchell',
-    age: 45,
-    condition: 'Routine Checkup',
-    urgency: 'low',
-    symptoms: 'Annual physical examination',
-  },
-  {
-    id: 4,
-    name: 'James Okonkwo',
-    age: 52,
-    condition: 'Diabetes Management',
-    urgency: 'medium',
-    symptoms: 'Blood sugar fluctuations',
-  },
-  {
-    id: 5,
-    name: 'Maria Rodriguez',
-    age: 29,
-    condition: 'Prenatal Care',
-    urgency: 'high',
-    symptoms: '28 weeks pregnant, routine monitoring',
-  },
-  {
-    id: 6,
-    name: 'David Kim',
-    age: 71,
-    condition: 'Post-Surgery Review',
-    urgency: 'high',
-    symptoms: 'Hip replacement follow-up',
-  },
-]
-
 function CalendarTab() {
+  const { simulationSettings, updateSimulationSettings } = useSimulationSettings()
+
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState(null)
-  const [patients, setPatients] = useState(initialPatients)
+  const [showDailyView, setShowDailyView] = useState(false)
+  const [patients, setPatients] = useState([])
   const [appointments, setAppointments] = useState([])
   const [activePatient, setActivePatient] = useState(null)
 
-  const schedulePatient = (patientId, date) => {
+  useEffect(() => {
+    if (simulationSettings?.patientQueue) {
+      const enabledUrgencyLevels = simulationSettings.urgencyLevelsEnabled || {
+        high: true,
+        medium: true,
+        low: true,
+      }
+      const filteredPatients = simulationSettings.patientQueue.filter(
+        (patient) => enabledUrgencyLevels[patient.urgency]
+      )
+      setPatients(filteredPatients)
+    }
+  }, [simulationSettings])
+
+  const schedulePatientAtTime = async (patientId, dateWithTime, hour) => {
     const patient = patients.find((p) => p.id === patientId)
     if (!patient) return
-    setAppointments([...appointments, { ...patient, scheduledDate: date, appointmentId: Date.now() }])
-    setPatients(patients.filter((p) => p.id !== patientId))
+
+    const newAppointment = {
+      ...patient,
+      scheduledDate: dateWithTime,
+      scheduledHour: hour,
+      appointmentId: Date.now(),
+    }
+
+    setAppointments([...appointments, newAppointment])
+
+    const remainingPatients = patients.filter((p) => p.id !== patientId)
+    setPatients(remainingPatients)
+
+    const updatedQueue = simulationSettings.patientQueue.filter((p) => p.id !== patientId)
+    await updateSimulationSettings({ patientQueue: updatedQueue })
+
     setActivePatient(null)
   }
 
   const handleCellClick = (day, monthStart) => {
     if (!isSameMonth(day, monthStart)) return
     setSelectedDate(day)
-    if (activePatient) schedulePatient(activePatient, day)
+    setShowDailyView(true)
+  }
+
+  const handleCloseDailyView = () => {
+    setShowDailyView(false)
+  }
+
+  const getAppointmentsForDay = (day) => {
+    return appointments.filter((apt) => isSameDay(apt.scheduledDate, day))
   }
 
   const renderCalendar = () => {
@@ -93,24 +85,37 @@ function CalendarTab() {
     const endDate = endOfWeek(monthEnd)
     const rows = []
 
+    const todayStart = startOfDay(new Date())
+    const minimumNoticeDays = simulationSettings?.minimumBookingNoticeDays || 0
+    const earliestBookableDate = addDays(todayStart, minimumNoticeDays)
+
     while (day <= endDate) {
       const week = []
       for (let i = 0; i < 7; i++) {
         const currentDay = day
-        const dayAppts = appointments.filter((apt) => isSameDay(apt.scheduledDate, currentDay))
-        const isDisabled = !isSameMonth(day, monthStart)
+        const currentDayStart = startOfDay(currentDay)
+        const dayAppts = getAppointmentsForDay(currentDay)
+        const isOutsideMonth = !isSameMonth(day, monthStart)
         const isSelected = isSameDay(day, selectedDate)
         const isToday = isSameDay(day, new Date())
+        const isPastDate = isBefore(currentDayStart, todayStart)
+        const isFutureWithinHorizon = !isPastDate && !isToday && isBefore(currentDayStart, earliestBookableDate)
+        const isUnbookable = isPastDate || isFutureWithinHorizon
+        const isDisabled = isOutsideMonth || isUnbookable
+
+        const maxPatientsReached = dayAppts.length >= (simulationSettings?.maxPatientsPerDay || 10)
+
+        const cellIsClickable = !isDisabled && !maxPatientsReached
 
         week.push(
           <div
             key={day.toString()}
-            className={`calendar-cell ${isDisabled ? 'disabled' : ''} ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}`}
-            onClick={() => handleCellClick(currentDay, monthStart)}
+            className={`calendar-cell ${isOutsideMonth ? 'disabled' : ''} ${isPastDate && !isOutsideMonth ? 'past-date' : ''} ${isFutureWithinHorizon && !isOutsideMonth ? 'booking-horizon' : ''} ${isSelected && showDailyView ? 'selected' : ''} ${isToday ? 'today' : ''} ${maxPatientsReached && !isDisabled ? 'full' : ''}`}
+            onClick={() => cellIsClickable && handleCellClick(currentDay, monthStart)}
           >
             <span className="day-number">{format(day, 'd')}</span>
             <div className="appointments-container">
-              {dayAppts.map((apt) => (
+              {dayAppts.slice(0, 3).map((apt) => (
                 <div
                   key={apt.appointmentId}
                   className={`appointment-chip urgency-${apt.urgency}`}
@@ -119,7 +124,10 @@ function CalendarTab() {
                   {apt.name.split(' ')[0]}
                 </div>
               ))}
+              {dayAppts.length > 3 && <div className="more-appointments">+{dayAppts.length - 3} more</div>}
             </div>
+            {maxPatientsReached && !isDisabled && <span className="full-indicator">Full</span>}
+            {isFutureWithinHorizon && !isOutsideMonth && <span className="horizon-indicator">Too Soon</span>}
           </div>
         )
         day = addDays(day, 1)
@@ -138,7 +146,7 @@ function CalendarTab() {
       <div className="calendar-section">
         <div className="section-header">
           <h2>Appointment Calendar</h2>
-          <p>Select a date to schedule patient appointments</p>
+          <p>Select a date to view and schedule appointments</p>
         </div>
 
         <div className="calendar-container">
@@ -163,10 +171,10 @@ function CalendarTab() {
           <div className="calendar-body">{renderCalendar()}</div>
         </div>
 
-        {selectedDate && (
-          <div className="selected-date-info">
-            <span className="date-label">Selected:</span>
-            <span className="date-value">{format(selectedDate, 'EEEE, MMMM do, yyyy')}</span>
+        {activePatient && !showDailyView && (
+          <div className="calendar-scheduling-hint">
+            <span className="hint-icon">👆</span>
+            <span>Select a date on the calendar to schedule the patient</span>
           </div>
         )}
       </div>
@@ -177,9 +185,20 @@ function CalendarTab() {
           activePatientCard={activePatient}
           setActivePatientCard={setActivePatient}
           selectedDate={selectedDate}
-          onSchedule={schedulePatient}
+          onSchedule={() => {}}
         />
       </div>
+
+      {showDailyView && selectedDate && (
+        <DailyScheduleView
+          selectedDate={selectedDate}
+          appointments={getAppointmentsForDay(selectedDate)}
+          activePatient={activePatient}
+          patients={patients}
+          onScheduleAtTime={schedulePatientAtTime}
+          onClose={handleCloseDailyView}
+        />
+      )}
     </div>
   )
 }

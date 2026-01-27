@@ -1,0 +1,453 @@
+.instructor-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-teal-light) 100%);
+  box-shadow: 0 4px 20px rgba(30, 107, 92, 0.3);
+}
+
+.dashboard-header-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.dashboard-logo-icon {
+  font-size: 2rem;
+}
+.dashboard-logo-text h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+}
+.dashboard-subtitle {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.dashboard-user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.user-email {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+}
+
+.logout-button {
+  padding: 0.5rem 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: white;
+}
+
+.dashboard-main {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.settings-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.05),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.settings-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--accent-teal);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.settings-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.simulation-status-card {
+  background: linear-gradient(135deg, #fff 0%, #f8fffe 100%);
+}
+
+.simulation-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.status-indicator {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-active {
+  background: var(--urgency-low-bg);
+  color: var(--urgency-low);
+}
+.status-inactive {
+  background: var(--urgency-high-bg);
+  color: var(--urgency-high);
+}
+
+.toggle-button {
+  width: 56px;
+  height: 30px;
+  border: none;
+  border-radius: 15px;
+  background: #e0e0e0;
+  cursor: pointer;
+  position: relative;
+  transition: background var(--transition-normal);
+}
+
+.toggle-button.toggle-active {
+  background: var(--accent-teal);
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform var(--transition-normal);
+}
+
+.toggle-active .toggle-slider {
+  transform: translateX(26px);
+}
+
+.parameter-group {
+  margin-bottom: 1rem;
+}
+
+.parameter-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.parameter-input {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  transition: all var(--transition-fast);
+}
+
+.parameter-input:focus {
+  outline: none;
+  border-color: var(--accent-teal);
+  box-shadow: 0 0 0 4px rgba(30, 107, 92, 0.1);
+}
+
+.parameter-hint {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+  font-weight: 400;
+}
+
+.urgency-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.urgency-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: var(--bg-muted);
+  border-radius: var(--radius-sm);
+}
+
+.urgency-badge {
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.urgency-high {
+  background: var(--urgency-high-bg);
+  color: var(--urgency-high);
+}
+.urgency-medium {
+  background: var(--urgency-medium-bg);
+  color: var(--urgency-medium);
+}
+.urgency-low {
+  background: var(--urgency-low-bg);
+  color: var(--urgency-low);
+}
+
+.mini-toggle {
+  width: 44px;
+  height: 24px;
+  border: none;
+  border-radius: 12px;
+  background: #d0d0d0;
+  cursor: pointer;
+  position: relative;
+  transition: background var(--transition-normal);
+}
+
+.mini-toggle.mini-toggle-active {
+  background: var(--accent-teal);
+}
+
+.mini-toggle-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform var(--transition-normal);
+}
+
+.mini-toggle-active .mini-toggle-slider {
+  transform: translateX(20px);
+}
+
+.patient-queue-card {
+  grid-column: span 2;
+}
+
+.add-patient-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--bg-muted);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.form-input-small {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  transition: all var(--transition-fast);
+}
+
+.form-input-small:focus {
+  outline: none;
+  border-color: var(--accent-teal);
+}
+.form-input-small.full-width {
+  width: 100%;
+}
+.age-input {
+  max-width: 80px;
+}
+
+.form-select-small {
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  background: white;
+  cursor: pointer;
+  min-width: 100px;
+}
+
+.form-select-small:focus {
+  outline: none;
+  border-color: var(--accent-teal);
+}
+
+.add-patient-button {
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-teal-light) 100%);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.add-patient-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 107, 92, 0.3);
+}
+
+.patient-queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.patient-queue-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: white;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.patient-queue-item:hover {
+  border-color: var(--accent-teal);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.patient-queue-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.patient-queue-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.patient-queue-details {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.remove-patient-button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: var(--urgency-high-bg);
+  color: var(--urgency-high);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.remove-patient-button:hover {
+  background: rgba(214, 48, 49, 0.2);
+}
+
+.empty-queue-message {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 2rem;
+  font-style: italic;
+}
+
+.dashboard-actions {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.reset-button {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid var(--urgency-high);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--urgency-high);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.reset-button:hover {
+  background: var(--urgency-high-bg);
+}
+
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 1024px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+  .patient-queue-card {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-header-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  .dashboard-main {
+    padding: 1rem;
+  }
+  .form-row {
+    flex-direction: column;
+  }
+  .age-input {
+    max-width: none;
+  }
+}

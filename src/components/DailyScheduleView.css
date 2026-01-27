@@ -1,0 +1,277 @@
+.daily-view-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+  animation: fadeIn var(--transition-fast);
+}
+
+.daily-view-modal {
+  background: white;
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-xl);
+  animation: slideUp var(--transition-normal);
+  overflow: hidden;
+}
+
+.daily-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-teal-light) 100%);
+  color: white;
+}
+
+.daily-view-back {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.daily-view-back:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.daily-view-title {
+  text-align: center;
+}
+.daily-view-title h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+.daily-view-date {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+.daily-view-spacer {
+  width: 120px;
+}
+
+.scheduling-patient-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, rgba(225, 112, 85, 0.1) 0%, rgba(225, 112, 85, 0.05) 100%);
+  border-bottom: 1px solid rgba(225, 112, 85, 0.2);
+}
+
+.scheduling-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-coral);
+  text-transform: uppercase;
+}
+.scheduling-patient-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.scheduling-urgency {
+  font-size: 1rem;
+}
+.scheduling-instruction {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.daily-schedule-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+.time-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.time-slot {
+  display: flex;
+  border: 1px solid #e8e8e8;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all var(--transition-fast);
+  min-height: 70px;
+}
+
+.time-slot.selectable {
+  cursor: pointer;
+  border-color: var(--accent-teal);
+  background: rgba(30, 107, 92, 0.02);
+}
+
+.time-slot.selectable:hover {
+  background: rgba(30, 107, 92, 0.08);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(30, 107, 92, 0.15);
+}
+
+.time-slot.occupied {
+  background: var(--bg-muted);
+}
+
+.time-slot-time {
+  width: 90px;
+  min-width: 90px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-muted);
+  border-right: 1px solid #e8e8e8;
+}
+
+.time-hour {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.time-slot-content {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.time-slot-empty {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+.available-text {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.click-to-schedule {
+  color: var(--accent-teal);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.time-slot-appointment {
+  padding: 0.5rem 0;
+}
+.time-slot-appointment.urgency-high {
+  border-left: 3px solid var(--urgency-high);
+  padding-left: 0.75rem;
+  margin-left: -0.75rem;
+}
+.time-slot-appointment.urgency-medium {
+  border-left: 3px solid var(--urgency-medium);
+  padding-left: 0.75rem;
+  margin-left: -0.75rem;
+}
+.time-slot-appointment.urgency-low {
+  border-left: 3px solid var(--urgency-low);
+  padding-left: 0.75rem;
+  margin-left: -0.75rem;
+}
+
+.appointment-main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+.appointment-patient-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.appointment-urgency-badge {
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.appointment-urgency-badge.urgency-high {
+  background: var(--urgency-high-bg);
+  color: var(--urgency-high);
+}
+.appointment-urgency-badge.urgency-medium {
+  background: var(--urgency-medium-bg);
+  color: var(--urgency-medium);
+}
+.appointment-urgency-badge.urgency-low {
+  background: var(--urgency-low-bg);
+  color: var(--urgency-low);
+}
+
+.appointment-details {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.daily-view-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--bg-muted);
+  border-top: 1px solid var(--border-light);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.hint-icon {
+  font-size: 1rem;
+}
+
+@media (max-width: 640px) {
+  .daily-view-modal {
+    max-height: 95vh;
+    border-radius: var(--radius-lg);
+  }
+  .daily-view-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+  .daily-view-back {
+    align-self: flex-start;
+  }
+  .daily-view-spacer {
+    display: none;
+  }
+  .scheduling-patient-banner {
+    flex-wrap: wrap;
+  }
+  .scheduling-instruction {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+  .time-slot-time {
+    width: 70px;
+    min-width: 70px;
+  }
+  .time-hour {
+    font-size: 0.75rem;
+  }
+}
