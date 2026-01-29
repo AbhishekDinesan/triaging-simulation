@@ -91,8 +91,30 @@ function PatientProfileModal({ patient, onClose, onSelectForScheduling, isSelect
 function PatientCardDeck({ patients, activePatientCard, setActivePatientCard, selectedDate, onSchedule }) {
   const { simulationSettings } = useSimulationSettings()
   const [viewingPatientProfile, setViewingPatientProfile] = useState(null)
+  const [currentStackIndex, setCurrentStackIndex] = useState(0)
 
   const minimumNoticeDays = simulationSettings?.minimumBookingNoticeDays || 0
+  const displayMode = simulationSettings?.patientDisplayMode || 'queue'
+  const isStackMode = displayMode === 'stack'
+
+  const validIndex = Math.min(currentStackIndex, Math.max(0, patients.length - 1))
+  if (validIndex !== currentStackIndex && patients.length > 0) {
+    setCurrentStackIndex(validIndex)
+  }
+
+  function handleNextPatient() {
+    if (currentStackIndex < patients.length - 1) {
+      setCurrentStackIndex(currentStackIndex + 1)
+      setActivePatientCard(null)
+    }
+  }
+
+  function handlePrevPatient() {
+    if (currentStackIndex > 0) {
+      setCurrentStackIndex(currentStackIndex - 1)
+      setActivePatientCard(null)
+    }
+  }
 
   function handleCardClick(patient) {
     setViewingPatientProfile(patient)
@@ -107,13 +129,20 @@ function PatientCardDeck({ patients, activePatientCard, setActivePatientCard, se
     setViewingPatientProfile(null)
   }
 
+  const currentPatient = isStackMode && patients.length > 0 ? patients[currentStackIndex] : null
+
   return (
-    <div className="patient-deck">
+    <div className={`patient-deck ${isStackMode ? 'stack-mode' : 'queue-mode'}`}>
       <div className="deck-header">
         <div>
-          <h3>🃏 Patient Queue</h3>
-          <p>{patients.length} patients awaiting scheduling</p>
+          <h3>{isStackMode ? '🃏 Patient Stack' : '📋 Patient Queue'}</h3>
+          <p>
+            {isStackMode && patients.length > 0
+              ? `Patient ${currentStackIndex + 1} of ${patients.length}`
+              : `${patients.length} patients awaiting scheduling`}
+          </p>
         </div>
+        {isStackMode && <span className="mode-badge">One at a time</span>}
       </div>
 
       {minimumNoticeDays > 0 && (
@@ -135,37 +164,63 @@ function PatientCardDeck({ patients, activePatientCard, setActivePatientCard, se
         </div>
       )}
 
+      {isStackMode && patients.length > 0 && (
+        <div className="stack-navigation">
+          <button className="stack-nav-btn prev" onClick={handlePrevPatient} disabled={currentStackIndex === 0}>
+            ← Previous
+          </button>
+          <div className="stack-progress">
+            {patients.map((_, idx) => (
+              <span
+                key={idx}
+                className={`progress-dot ${idx === currentStackIndex ? 'active' : ''} ${idx < currentStackIndex ? 'completed' : ''}`}
+              />
+            ))}
+          </div>
+          <button
+            className="stack-nav-btn next"
+            onClick={handleNextPatient}
+            disabled={currentStackIndex === patients.length - 1}
+          >
+            Next →
+          </button>
+        </div>
+      )}
+
       <div className="cards-container">
-        {patients.map((patient) => (
+        {isStackMode && currentPatient && (
           <div
-            key={patient.id}
-            className={`patient-card urgency-${patient.urgency} ${activePatientCard === patient.id ? 'active' : ''}`}
-            onClick={() => handleCardClick(patient)}
+            key={currentPatient.id}
+            className={`patient-card stack-card urgency-${currentPatient.urgency} ${activePatientCard === currentPatient.id ? 'active' : ''}`}
+            onClick={() => handleCardClick(currentPatient)}
           >
             <div className="card-header">
               <div className="patient-avatar">
-                {patient.name
+                {currentPatient.name
                   .split(' ')
                   .map((n) => n[0])
                   .join('')}
               </div>
               <div className="patient-info">
-                <div className="patient-name">{patient.name}</div>
-                <span className="patient-age">Age: {patient.age}</span>
+                <div className="patient-name">{currentPatient.name}</div>
+                <span className="patient-age">Age: {currentPatient.age}</span>
               </div>
               <div className="urgency-badge">
-                {URGENCY_CONFIG[patient.urgency]?.icon} {URGENCY_CONFIG[patient.urgency]?.label}
+                {URGENCY_CONFIG[currentPatient.urgency]?.icon} {URGENCY_CONFIG[currentPatient.urgency]?.label}
               </div>
             </div>
 
             <div className="card-body">
               <div className="card-condition">
-                <span className="label">Condition:</span> {patient.condition}
+                <span className="label">Condition:</span> {currentPatient.condition}
+              </div>
+              <div className="card-symptoms">
+                <span className="label">Symptoms:</span> {currentPatient.symptoms}
               </div>
             </div>
 
             <div className="card-footer">
-              {activePatientCard === patient.id ? (
+              {activePatientCard === currentPatient.id ? (
                 <div className="action-buttons">
                   <button
                     className="cancel-btn"
@@ -181,7 +236,7 @@ function PatientCardDeck({ patients, activePatientCard, setActivePatientCard, se
                       className="schedule-btn"
                       onClick={(e) => {
                         e.stopPropagation()
-                        onSchedule(patient.id, selectedDate)
+                        onSchedule(currentPatient.id, selectedDate)
                       }}
                     >
                       Confirm
@@ -189,11 +244,71 @@ function PatientCardDeck({ patients, activePatientCard, setActivePatientCard, se
                   )}
                 </div>
               ) : (
-                <span className="tap-hint">Tap to view profile →</span>
+                <span className="tap-hint">Tap to view full profile →</span>
               )}
             </div>
           </div>
-        ))}
+        )}
+
+        {!isStackMode &&
+          patients.map((patient) => (
+            <div
+              key={patient.id}
+              className={`patient-card urgency-${patient.urgency} ${activePatientCard === patient.id ? 'active' : ''}`}
+              onClick={() => handleCardClick(patient)}
+            >
+              <div className="card-header">
+                <div className="patient-avatar">
+                  {patient.name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')}
+                </div>
+                <div className="patient-info">
+                  <div className="patient-name">{patient.name}</div>
+                  <span className="patient-age">Age: {patient.age}</span>
+                </div>
+                <div className="urgency-badge">
+                  {URGENCY_CONFIG[patient.urgency]?.icon} {URGENCY_CONFIG[patient.urgency]?.label}
+                </div>
+              </div>
+
+              <div className="card-body">
+                <div className="card-condition">
+                  <span className="label">Condition:</span> {patient.condition}
+                </div>
+              </div>
+
+              <div className="card-footer">
+                {activePatientCard === patient.id ? (
+                  <div className="action-buttons">
+                    <button
+                      className="cancel-btn"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setActivePatientCard(null)
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    {selectedDate && (
+                      <button
+                        className="schedule-btn"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onSchedule(patient.id, selectedDate)
+                        }}
+                      >
+                        Confirm
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <span className="tap-hint">Tap to view profile →</span>
+                )}
+              </div>
+            </div>
+          ))}
 
         {patients.length === 0 && (
           <div className="empty-deck">

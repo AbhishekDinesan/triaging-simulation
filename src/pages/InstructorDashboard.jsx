@@ -191,6 +191,29 @@ function InstructorDashboard() {
           </section>
 
           <section className="settings-card">
+            <h2 className="settings-card-title">Patient Display Mode</h2>
+            <p className="settings-description">Choose how patients are displayed to students.</p>
+            <div className="display-mode-toggle">
+              <button
+                className={`mode-option ${simulationSettings.patientDisplayMode === 'queue' ? 'mode-active' : ''}`}
+                onClick={() => updateSimulationSettings({ patientDisplayMode: 'queue' })}
+              >
+                <span className="mode-icon">📋</span>
+                <span className="mode-label">Queue View</span>
+                <span className="mode-desc">All patients visible</span>
+              </button>
+              <button
+                className={`mode-option ${simulationSettings.patientDisplayMode === 'stack' ? 'mode-active' : ''}`}
+                onClick={() => updateSimulationSettings({ patientDisplayMode: 'stack' })}
+              >
+                <span className="mode-icon">🃏</span>
+                <span className="mode-label">Stack View</span>
+                <span className="mode-desc">One patient at a time</span>
+              </button>
+            </div>
+          </section>
+
+          <section className="settings-card">
             <h2 className="settings-card-title">Urgency Levels</h2>
             <p className="settings-description">Enable or disable urgency levels for the simulation.</p>
             <div className="urgency-toggles">

@@ -8,6 +8,7 @@ const DEFAULT_SIMULATION_SETTINGS = {
   simulationEnabled: true,
   maxPatientsPerDay: 10,
   minimumBookingNoticeDays: 0,
+  patientDisplayMode: 'queue',
   urgencyLevelsEnabled: {
     high: true,
     medium: true,
