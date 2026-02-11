@@ -45,23 +45,7 @@ To get these values:
 ```bash
 npm run dev
 ```
-
 App runs at `http://localhost:5173/`
-
-## Scheduling Rules
-
-### 3-Week Cycle (Starting Jan 25, 2026)
-- **Week 1 & 2**: Max 3 Assessments (AX) per clinician per week
-- **Week 3**: Max 6 Service Planning (SP) sessions per clinician per week
-
-### Clinician Limits
-- Max 20 appointments per week
-- Max 4 appointments per day
-
-### Therapy Block Components
-1. **Assessment (AX)** - Initial client evaluation
-2. **Service Planning (SP)** - Treatment plan development
-3. **Therapy Blocks (6 sessions)** - Active rehabilitation sessions
 
 ## Scripts
 
