@@ -1,8 +1,15 @@
-# Medical Triaging Simulation
+# Pediatric Rehabilitation Scheduler
 
-An educational web application for medical triaging simulation.
+An educational web application for simulating pediatric rehabilitation scheduling.
 
 **University of Waterloo — Prof. Abouee-Mehriz & Team**
+
+## Features
+
+- **Full Therapy Block Scheduling**: Schedule clients for a complete rehabilitation program (1 AX + 1 SP + 6 Therapy Blocks)
+- **3-Week Cycle Constraints**: Assessments (AX) in weeks 1-2, Service Planning (SP) in week 3
+- **Clinician Management**: Assign clients to specific clinicians with capacity limits (20/week, 4/day)
+- **Visual Calendar**: View scheduled appointments by clinician with cycle week indicators
 
 ## Setup
 
@@ -40,6 +47,21 @@ npm run dev
 ```
 
 App runs at `http://localhost:5173/`
+
+## Scheduling Rules
+
+### 3-Week Cycle (Starting Jan 25, 2026)
+- **Week 1 & 2**: Max 3 Assessments (AX) per clinician per week
+- **Week 3**: Max 6 Service Planning (SP) sessions per clinician per week
+
+### Clinician Limits
+- Max 20 appointments per week
+- Max 4 appointments per day
+
+### Therapy Block Components
+1. **Assessment (AX)** - Initial client evaluation
+2. **Service Planning (SP)** - Treatment plan development
+3. **Therapy Blocks (6 sessions)** - Active rehabilitation sessions
 
 ## Scripts
 

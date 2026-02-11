@@ -5,17 +5,11 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #0d3b2e 0%, #1a5c4b 50%, #0d3b2e 100%);
+  background: var(--bg-primary);
 }
 
 .login-background-pattern {
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 60px 60px;
-  pointer-events: none;
+  display: none;
 }
 
 .login-container {
@@ -25,12 +19,22 @@
   max-width: 520px;
   margin: 2rem;
   padding: 3rem;
-  background: rgba(255, 255, 255, 0.97);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   border-radius: 24px;
-  box-shadow:
-    var(--shadow-xl),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-lg);
   animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .login-header {
@@ -38,23 +42,16 @@
   margin-bottom: 2.5rem;
 }
 
-.login-logo-icon {
-  display: inline-block;
-  font-size: 3.5rem;
-  margin-bottom: 1rem;
-  animation: pulse 2s infinite ease-in-out;
-}
-
 .login-title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: var(--accent-teal);
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
 
 .login-subtitle {
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.15em;
 }
@@ -63,12 +60,16 @@
   margin-bottom: 2rem;
 }
 
-.role-section-title {
+.role-section-title,
+.demo-section-title {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 1rem;
   text-align: center;
+}
+
+.role-section-title {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
 }
 
 .role-cards-container {
@@ -82,8 +83,8 @@
   flex-direction: column;
   align-items: center;
   padding: 1.5rem 1rem;
-  border: 2px solid var(--border-medium);
-  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
   background: var(--bg-muted);
   cursor: pointer;
   transition: all 0.25s ease;
@@ -92,30 +93,29 @@
 .role-card:hover {
   border-color: var(--accent-teal);
   background: rgba(30, 107, 92, 0.05);
-  transform: translateY(-2px);
 }
 
 .role-card-selected {
   border-color: var(--accent-teal);
   background: rgba(30, 107, 92, 0.1);
-  box-shadow: 0 4px 12px rgba(30, 107, 92, 0.2);
 }
 
-.role-icon {
-  font-size: 2.5rem;
-  margin-bottom: 0.75rem;
-}
 .role-name {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 0.25rem;
 }
+
 .role-description {
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   text-align: center;
   line-height: 1.4;
+}
+
+.role-card-selected .role-name {
+  color: var(--accent-teal);
 }
 
 .login-form {
@@ -123,6 +123,15 @@
   flex-direction: column;
   gap: 1.25rem;
   animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .form-input-group {
@@ -134,22 +143,23 @@
 .form-label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-secondary);
 }
 
 .form-input {
   padding: 0.875rem 1rem;
-  border: 2px solid var(--border-medium);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--border-medium);
+  border-radius: 12px;
   font-size: 1rem;
-  transition: all var(--transition-fast);
-  background: white;
+  transition: all 0.2s ease;
+  background: var(--bg-card);
+  color: var(--text-primary);
 }
 
 .form-input:focus {
   outline: none;
   border-color: var(--accent-teal);
-  box-shadow: 0 0 0 4px rgba(30, 107, 92, 0.1);
+  box-shadow: 0 0 0 3px rgba(30, 107, 92, 0.1);
 }
 
 .form-input::placeholder {
@@ -158,10 +168,10 @@
 
 .auth-error-message {
   padding: 0.875rem 1rem;
-  background: var(--urgency-high-bg);
+  background: var(--priority-high-bg);
   border: 1px solid rgba(214, 48, 49, 0.3);
-  border-radius: var(--radius-sm);
-  color: var(--urgency-high);
+  border-radius: 10px;
+  color: var(--priority-high);
   font-size: 0.875rem;
   text-align: center;
 }
@@ -169,19 +179,17 @@
 .submit-button {
   padding: 1rem 1.5rem;
   border: none;
-  border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-teal-light) 100%);
+  border-radius: 12px;
+  background: var(--accent-teal);
   color: white;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.25s ease;
-  box-shadow: 0 4px 12px rgba(30, 107, 92, 0.3);
 }
 
 .submit-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(30, 107, 92, 0.4);
+  background: var(--accent-teal-light);
 }
 
 .submit-button:disabled {
@@ -196,11 +204,85 @@
   color: var(--accent-teal);
   font-size: 0.9rem;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .toggle-mode-button:hover {
   color: var(--accent-teal-light);
   text-decoration: underline;
+}
+
+.demo-mode-section {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.demo-section-title {
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.demo-description {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.demo-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.demo-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid rgba(0, 184, 148, 0.3);
+  border-radius: 12px;
+  background: var(--priority-low-bg);
+  color: var(--priority-low);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.demo-button:hover {
+  background: rgba(0, 184, 148, 0.15);
+  border-color: var(--priority-low);
+}
+
+.demo-button.instructor-demo {
+  border-color: rgba(225, 112, 85, 0.3);
+  background: var(--priority-medium-bg);
+  color: var(--priority-medium);
+}
+
+.demo-button.instructor-demo:hover {
+  background: rgba(225, 112, 85, 0.15);
+  border-color: var(--priority-medium);
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-light);
 }
 
 @media (max-width: 540px) {
@@ -210,6 +292,9 @@
   }
   .role-cards-container {
     grid-template-columns: 1fr;
+  }
+  .demo-buttons {
+    flex-direction: column;
   }
   .login-title {
     font-size: 1.5rem;

@@ -5,6 +5,11 @@ import { firebaseAuth, firestoreDatabase } from '../firebase/firebaseConfig'
 
 const AuthContext = createContext(null)
 
+const DEMO_USERS = {
+  student: { uid: 'demo-student', email: 'demo-student@example.com' },
+  instructor: { uid: 'demo-instructor', email: 'demo-instructor@example.com' },
+}
+
 export function useAuthContext() {
   const context = useContext(AuthContext)
   if (!context) {
@@ -17,6 +22,7 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null)
   const [userRole, setUserRole] = useState(null)
   const [authLoading, setAuthLoading] = useState(true)
+  const [isDemoMode, setIsDemoMode] = useState(false)
 
   async function registerUser(email, password, role) {
     const userCredential = await createUserWithEmailAndPassword(firebaseAuth, email, password)
@@ -40,8 +46,28 @@ export function AuthProvider({ children }) {
   }
 
   function logoutUser() {
+    if (isDemoMode) {
+      setCurrentUser(null)
+      setUserRole(null)
+      setIsDemoMode(false)
+      return Promise.resolve()
+    }
     setUserRole(null)
     return signOut(firebaseAuth)
+  }
+
+  function enterDemoMode(role) {
+    setIsDemoMode(true)
+    setCurrentUser(DEMO_USERS[role])
+    setUserRole(role)
+    setAuthLoading(false)
+  }
+
+  function switchDemoRole(role) {
+    if (isDemoMode) {
+      setCurrentUser(DEMO_USERS[role])
+      setUserRole(role)
+    }
   }
 
   useEffect(() => {
@@ -65,10 +91,13 @@ export function AuthProvider({ children }) {
     currentUser,
     userRole,
     authLoading,
+    isDemoMode,
     registerUser,
     loginUser,
     logoutUser,
     setUserRole,
+    enterDemoMode,
+    switchDemoRole,
   }
 
   return <AuthContext.Provider value={authContextValue}>{children}</AuthContext.Provider>

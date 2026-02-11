@@ -8,6 +8,37 @@ const USER_ROLES = {
   INSTRUCTOR: 'instructor',
 }
 
+const AUTH_ERROR_MESSAGES = {
+  'auth/email-already-in-use': 'This email is already registered',
+  'auth/weak-password': 'Password should be at least 6 characters',
+  'auth/invalid-email': 'Please enter a valid email address',
+  'auth/user-not-found': 'No account found with this email',
+  'auth/wrong-password': 'Incorrect password',
+  'auth/invalid-credential': 'Invalid email or password',
+}
+
+const DEMO_OPTIONS = [
+  { role: USER_ROLES.STUDENT, label: 'Demo as Student', className: 'student-demo' },
+  { role: USER_ROLES.INSTRUCTOR, label: 'Demo as Instructor', className: 'instructor-demo' },
+]
+
+const ROLE_OPTIONS = [
+  {
+    role: USER_ROLES.STUDENT,
+    name: 'Student',
+    description: 'Practice scheduling rehabilitation clients',
+  },
+  {
+    role: USER_ROLES.INSTRUCTOR,
+    name: 'Instructor',
+    description: 'Configure simulation settings',
+  },
+]
+
+function getRoleLabel(role) {
+  return role === USER_ROLES.INSTRUCTOR ? 'Instructor' : 'Student'
+}
+
 function LoginPage() {
   const [selectedRole, setSelectedRole] = useState(null)
   const [emailInput, setEmailInput] = useState('')
@@ -16,8 +47,13 @@ function LoginPage() {
   const [authErrorMessage, setAuthErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { loginUser, registerUser, setUserRole } = useAuthContext()
+  const { loginUser, registerUser, setUserRole, enterDemoMode } = useAuthContext()
   const navigate = useNavigate()
+
+  function handleDemoMode(role) {
+    enterDemoMode(role)
+    navigate(role === USER_ROLES.INSTRUCTOR ? '/instructor' : '/student')
+  }
 
   async function handleFormSubmit(event) {
     event.preventDefault()
@@ -37,21 +73,9 @@ function LoginPage() {
         setUserRole(selectedRole)
       }
 
-      if (selectedRole === USER_ROLES.INSTRUCTOR) {
-        navigate('/instructor')
-      } else {
-        navigate('/student')
-      }
+      navigate(selectedRole === USER_ROLES.INSTRUCTOR ? '/instructor' : '/student')
     } catch (error) {
-      const errorMessages = {
-        'auth/email-already-in-use': 'This email is already registered',
-        'auth/weak-password': 'Password should be at least 6 characters',
-        'auth/invalid-email': 'Please enter a valid email address',
-        'auth/user-not-found': 'No account found with this email',
-        'auth/wrong-password': 'Incorrect password',
-        'auth/invalid-credential': 'Invalid email or password',
-      }
-      setAuthErrorMessage(errorMessages[error.code] || 'Authentication failed. Please try again.')
+      setAuthErrorMessage(AUTH_ERROR_MESSAGES[error.code] || 'Authentication failed. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -67,33 +91,45 @@ function LoginPage() {
       <div className="login-background-pattern"></div>
       <div className="login-container">
         <div className="login-header">
-          <span className="login-logo-icon">🩺</span>
-          <h1 className="login-title">Medical Triage Simulation</h1>
+          <h1 className="login-title">Pediatric Rehab Scheduler</h1>
           <p className="login-subtitle">University of Waterloo</p>
+        </div>
+
+        <div className="demo-mode-section">
+          <h2 className="demo-section-title">Quick Demo</h2>
+          <p className="demo-description">Try the app without creating an account</p>
+          <div className="demo-buttons">
+            {DEMO_OPTIONS.map((option) => (
+              <button
+                key={option.role}
+                type="button"
+                className={`demo-button ${option.className}`}
+                onClick={() => handleDemoMode(option.role)}
+              >
+                <span>{option.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="login-divider">
+          <span>or sign in with email</span>
         </div>
 
         <div className="role-selection-section">
           <h2 className="role-section-title">Select Your Role</h2>
           <div className="role-cards-container">
-            <button
-              type="button"
-              className={`role-card ${selectedRole === USER_ROLES.STUDENT ? 'role-card-selected' : ''}`}
-              onClick={() => handleRoleSelection(USER_ROLES.STUDENT)}
-            >
-              <span className="role-icon">🎓</span>
-              <span className="role-name">Student</span>
-              <span className="role-description">Practice triaging and scheduling patients</span>
-            </button>
-
-            <button
-              type="button"
-              className={`role-card ${selectedRole === USER_ROLES.INSTRUCTOR ? 'role-card-selected' : ''}`}
-              onClick={() => handleRoleSelection(USER_ROLES.INSTRUCTOR)}
-            >
-              <span className="role-icon">👨‍🏫</span>
-              <span className="role-name">Instructor</span>
-              <span className="role-description">Configure simulation settings</span>
-            </button>
+            {ROLE_OPTIONS.map((option) => (
+              <button
+                key={option.role}
+                type="button"
+                className={`role-card ${selectedRole === option.role ? 'role-card-selected' : ''}`}
+                onClick={() => handleRoleSelection(option.role)}
+              >
+                <span className="role-name">{option.name}</span>
+                <span className="role-description">{option.description}</span>
+              </button>
+            ))}
           </div>
         </div>
 
@@ -135,8 +171,8 @@ function LoginPage() {
               {isSubmitting
                 ? 'Please wait...'
                 : isRegistrationMode
-                  ? `Register as ${selectedRole === USER_ROLES.INSTRUCTOR ? 'Instructor' : 'Student'}`
-                  : `Sign In as ${selectedRole === USER_ROLES.INSTRUCTOR ? 'Instructor' : 'Student'}`}
+                  ? `Register as ${getRoleLabel(selectedRole)}`
+                  : `Sign In as ${getRoleLabel(selectedRole)}`}
             </button>
 
             <button

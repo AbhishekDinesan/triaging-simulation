@@ -1,0 +1,673 @@
+.wizard-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.wizard-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  animation: slideUp 0.3s ease;
+}
+
+.wizard-client-card,
+.clinician-card,
+.preview-section,
+.preview-item,
+.success-apt-item {
+  border: 1px solid var(--border-light);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.wizard-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--bg-muted);
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.wizard-close:hover {
+  background: var(--priority-high-bg);
+  color: var(--priority-high);
+  border-color: var(--priority-high);
+}
+
+.wizard-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.wizard-header-text h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.wizard-header-text p {
+  margin: 0.25rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.wizard-client-card {
+  margin: 1.5rem 2rem;
+  background: var(--bg-muted);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  gap: 1rem;
+}
+
+.client-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1.2rem;
+  grid-row: span 2;
+}
+
+.client-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.client-info h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.client-age {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  background: var(--bg-card);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+.priority-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.priority-high {
+  background: var(--priority-high-bg);
+  color: var(--priority-high);
+}
+
+.priority-medium {
+  background: var(--priority-medium-bg);
+  color: var(--priority-medium);
+}
+
+.priority-low {
+  background: var(--priority-low-bg);
+  color: var(--priority-low);
+}
+
+.client-details {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.detail-label {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  min-width: 90px;
+}
+
+.detail-value {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  flex: 1;
+}
+
+.wizard-cycle-info {
+  margin: 0 2rem 1.5rem;
+  background: rgba(30, 107, 92, 0.05);
+  border: 1px solid rgba(30, 107, 92, 0.15);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.cycle-badge {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cycle-week {
+  color: var(--accent-teal);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.cycle-constraints {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.appointment-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.appointment-summary > span {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.appointment-types-preview {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.apt-type,
+.preview-type-badge,
+.apt-badge {
+  font-size: 0.75rem;
+  color: white;
+  white-space: nowrap;
+}
+
+.apt-type,
+.preview-type-badge {
+  font-weight: 500;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+}
+
+.wizard-section {
+  padding: 0 2rem 1.5rem;
+}
+
+.wizard-section h4 {
+  margin: 0 0 0.25rem;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.section-hint {
+  margin: 0 0 1rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.clinician-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 600px) {
+  .clinician-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.clinician-card {
+  background: var(--bg-muted);
+  border-radius: 12px;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.clinician-card:hover {
+  border-color: var(--border-medium);
+  background: var(--bg-card);
+}
+
+.clinician-card.selected {
+  border-color: var(--accent-teal);
+  background: rgba(30, 107, 92, 0.05);
+}
+
+.clinician-color-bar {
+  height: 4px;
+  width: 100%;
+}
+
+.clinician-card-content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.clinician-name {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.clinician-specialty {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.clinician-availability {
+  margin-top: 0.5rem;
+}
+
+.availability-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+}
+
+.availability-badge.available {
+  background: var(--priority-low-bg);
+  color: var(--priority-low);
+}
+
+.availability-badge.limited {
+  background: var(--priority-medium-bg);
+  color: var(--priority-medium);
+}
+
+.availability-badge.fully-booked {
+  background: var(--priority-high-bg);
+  color: var(--priority-high);
+}
+
+.clinician-stats {
+  margin-top: 0.5rem;
+}
+
+.clinician-stats .stat-total {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.clinician-card.fully-booked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.clinician-card.fully-booked:hover {
+  border-color: var(--border-light);
+  background: var(--bg-muted);
+  transform: none;
+}
+
+.check-mark {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: var(--accent-teal);
+  color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.wizard-error {
+  margin: 0 2rem 1.5rem;
+  background: var(--priority-high-bg);
+  border: 1px solid rgba(214, 48, 49, 0.3);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: var(--priority-high);
+  font-size: 0.9rem;
+}
+
+.preview-section {
+  background: var(--bg-muted);
+  margin: 0 1rem 1.5rem;
+  padding: 1.25rem;
+  border-radius: 12px;
+}
+
+.preview-section h4,
+.preview-section .section-hint {
+  padding-left: 0.5rem;
+}
+
+.preview-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.preview-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--bg-card);
+  border-radius: 10px;
+}
+
+.preview-sequence {
+  width: 26px;
+  height: 26px;
+  background: var(--bg-muted);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.preview-date {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.date-main {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.date-year {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.preview-cycle {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--bg-muted);
+  border-radius: 4px;
+}
+
+.wizard-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.25rem 2rem;
+  border-top: 1px solid var(--border-light);
+  background: var(--bg-muted);
+  border-radius: 0 0 20px 20px;
+}
+
+.wizard-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.wizard-btn.cancel {
+  background: transparent;
+  border: 1px solid var(--border-medium);
+  color: var(--text-secondary);
+}
+
+.wizard-btn.cancel:hover {
+  background: var(--bg-card);
+  border-color: var(--text-secondary);
+}
+
+.wizard-btn.confirm {
+  background: var(--accent-teal);
+  color: white;
+}
+
+.wizard-btn.confirm:hover:not(:disabled) {
+  background: var(--accent-teal-light);
+}
+
+.wizard-btn.confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.success-modal {
+  max-width: 520px;
+}
+
+.success-content {
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+
+.success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  animation: successPop 0.4s ease-out;
+  color: var(--priority-low);
+}
+
+.success-icon svg {
+  width: 64px;
+  height: 64px;
+}
+
+@keyframes successPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.success-title {
+  color: var(--priority-low);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.success-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin: 0 0 2rem;
+}
+
+.success-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: var(--priority-low-bg);
+  border: 1px solid rgba(0, 184, 148, 0.2);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.summary-client,
+.summary-clinician,
+.summary-dates {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary-label {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.summary-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.success-appointments {
+  text-align: left;
+  margin-bottom: 2rem;
+}
+
+.success-appointments h4 {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 1rem;
+}
+
+.success-apt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.success-apt-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-muted);
+  border-radius: 8px;
+}
+
+.apt-number {
+  width: 24px;
+  height: 24px;
+  background: var(--priority-low-bg);
+  color: var(--priority-low);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.apt-badge {
+  font-weight: 500;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+}
+
+.apt-date {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-left: auto;
+}
+
+.success-close-btn {
+  width: 100%;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  background: var(--priority-low);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.success-close-btn:hover {
+  background: #00a884;
+}

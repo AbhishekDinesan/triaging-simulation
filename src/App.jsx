@@ -6,16 +6,20 @@ import StudentPage from './pages/StudentPage'
 import InstructorDashboard from './pages/InstructorDashboard'
 import './App.css'
 
+function AuthLoadingScreen() {
+  return (
+    <div className="auth-loading-screen">
+      <div className="auth-loading-spinner"></div>
+      <p>Loading...</p>
+    </div>
+  )
+}
+
 function ProtectedRoute({ children, allowedRole }) {
   const { currentUser, userRole, authLoading } = useAuthContext()
 
   if (authLoading) {
-    return (
-      <div className="auth-loading-screen">
-        <span className="auth-loading-icon">🩺</span>
-        <p>Loading...</p>
-      </div>
-    )
+    return <AuthLoadingScreen />
   }
 
   if (!currentUser) {
@@ -34,12 +38,7 @@ function AppRoutes() {
   const { currentUser, userRole, authLoading } = useAuthContext()
 
   if (authLoading) {
-    return (
-      <div className="auth-loading-screen">
-        <span className="auth-loading-icon">🩺</span>
-        <p>Loading...</p>
-      </div>
-    )
+    return <AuthLoadingScreen />
   }
 
   return (
