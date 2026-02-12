@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useRef } from 'react'
-import { format } from 'date-fns'
-import { useSimulationSettings } from '../../simulation/SimulationSettingsContext'
+import { format, startOfWeek, startOfMonth } from 'date-fns'
+import { useSimulationSettings } from '../context/SimulationSettingsContext'
 import { APPOINTMENT_TYPES, CONSTRAINTS } from '../utils/schedulingUtils'
 import './HistoryPlayground.css'
 
@@ -113,6 +113,19 @@ function typeColor(type) {
   return APPOINTMENT_TYPES[type]?.color || '#64748b'
 }
 
+function isCancelledStatus(status, cancelDatetime) {
+  const normalizedStatus = (status || '').toLowerCase()
+  return normalizedStatus.includes('cancel') || Boolean(cancelDatetime)
+}
+
+function getLeadDays(row) {
+  if (!row.bookedDateParsed || !row.scheduledDateParsed) return null
+  if (Number.isNaN(row.bookedDateParsed) || Number.isNaN(row.scheduledDateParsed)) return null
+  const diffMs = row.scheduledDateParsed.getTime() - row.bookedDateParsed.getTime()
+  if (diffMs < 0) return null
+  return Math.floor(diffMs / (24 * 60 * 60 * 1000))
+}
+
 function HistoryPlayground() {
   const { simulationSettings } = useSimulationSettings()
 
@@ -127,6 +140,8 @@ function HistoryPlayground() {
   const [filterType, setFilterType] = useState('all')
   const [filterClinician, setFilterClinician] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all')
+  const [trendGranularity, setTrendGranularity] = useState('week')
+  const [prescriptiveThresholdWeeks, setPrescriptiveThresholdWeeks] = useState(4)
 
   const [code, setCode] = useState(CODE_SNIPPETS[0].code)
   const [output, setOutput] = useState(null)
@@ -266,11 +281,77 @@ function HistoryPlayground() {
     return counts
   }, [appointments])
 
+  const trendSeries = useMemo(() => {
+    const grouped = new Map()
+
+    historyRows.forEach((row) => {
+      const scheduledDate = row.scheduledDateParsed
+      if (!scheduledDate || Number.isNaN(scheduledDate)) return
+
+      const periodStart =
+        trendGranularity === 'month' ? startOfMonth(scheduledDate) : startOfWeek(scheduledDate, { weekStartsOn: 0 })
+      const periodKey = format(periodStart, 'yyyy-MM-dd')
+      const current = grouped.get(periodKey) || {
+        key: periodKey,
+        periodStart,
+        label: trendGranularity === 'month' ? format(periodStart, 'MMM yyyy') : format(periodStart, 'MMM d'),
+        cancelled: 0,
+        total: 0,
+      }
+
+      current.total += 1
+      if (isCancelledStatus(row.status, row.cancelDatetime)) current.cancelled += 1
+      grouped.set(periodKey, current)
+    })
+
+    return [...grouped.values()]
+      .sort((a, b) => a.periodStart.getTime() - b.periodStart.getTime())
+      .map((item) => ({
+        ...item,
+        cancellationRate: item.total > 0 ? (item.cancelled / item.total) * 100 : 0,
+      }))
+  }, [historyRows, trendGranularity])
+
+  const prescriptiveStats = useMemo(() => {
+    const thresholdDays = prescriptiveThresholdWeeks * 7
+    const leadRows = historyRows
+      .map((row) => {
+        const leadDays = getLeadDays(row)
+        if (leadDays === null) return null
+        return { leadDays, cancelled: isCancelledStatus(row.status, row.cancelDatetime) }
+      })
+      .filter(Boolean)
+
+    const longLead = leadRows.filter((row) => row.leadDays >= thresholdDays)
+    const shortLead = leadRows.filter((row) => row.leadDays < thresholdDays)
+
+    const longCancelled = longLead.filter((row) => row.cancelled).length
+    const shortCancelled = shortLead.filter((row) => row.cancelled).length
+
+    const longRate = longLead.length ? (longCancelled / longLead.length) * 100 : 0
+    const shortRate = shortLead.length ? (shortCancelled / shortLead.length) * 100 : 0
+    const relativeLift = shortRate > 0 ? ((longRate - shortRate) / shortRate) * 100 : null
+
+    const expectedLongCancelledAtShortRate = (shortRate / 100) * longLead.length
+    const avoidableCancellations = Math.max(0, longCancelled - expectedLongCancelledAtShortRate)
+
+    return {
+      thresholdDays,
+      sampleSize: leadRows.length,
+      longLeadCount: longLead.length,
+      shortLeadCount: shortLead.length,
+      longRate,
+      shortRate,
+      relativeLift,
+      avoidableCancellations,
+    }
+  }, [historyRows, prescriptiveThresholdWeeks])
+
   return (
     <div className="history-playground">
       <div className="hp-header">
         <div className="hp-header-text">
-          <h2>Historical Data &amp; Playground</h2>
+          <h2>Historical Data</h2>
           <p>Explore past scheduling records and write code to analyze the data</p>
         </div>
         <div className="hp-section-toggle">
@@ -356,6 +437,92 @@ function HistoryPlayground() {
             <div className="hp-filter-count">
               {historyRows.length} record{historyRows.length !== 1 ? 's' : ''}
             </div>
+          </div>
+
+          <div className="hp-insight-grid">
+            <section className="hp-insight-card">
+              <div className="hp-insight-header">
+                <h3>Trend Analysis</h3>
+                <select
+                  className="hp-insight-select"
+                  value={trendGranularity}
+                  onChange={(event) => setTrendGranularity(event.target.value)}
+                >
+                  <option value="week">Weekly</option>
+                  <option value="month">Monthly</option>
+                </select>
+              </div>
+              <p className="hp-insight-subtitle">Cancellation rate over time for the current filtered dataset</p>
+              <div className="hp-trend-chart">
+                {trendSeries.length === 0 && <div className="hp-chart-empty">No valid dates in current filter.</div>}
+                {trendSeries.map((point) => (
+                  <div key={point.key} className="hp-trend-point">
+                    <div className="hp-trend-bar-wrap">
+                      <div className="hp-trend-bar" style={{ height: `${Math.max(point.cancellationRate, 2)}%` }}>
+                        <span className="hp-trend-bar-label">{point.cancellationRate.toFixed(0)}%</span>
+                      </div>
+                    </div>
+                    <span className="hp-trend-label">{point.label}</span>
+                    <span className="hp-trend-count">
+                      {point.cancelled}/{point.total}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="hp-insight-card">
+              <div className="hp-insight-header">
+                <h3>Prescriptive Analysis</h3>
+                <span className="hp-insight-pill">Lead-Time Risk</span>
+              </div>
+              <p className="hp-insight-subtitle">
+                Compare cancellation risk for appointments booked farther in advance
+              </p>
+              <label htmlFor="prescriptive-threshold" className="hp-threshold-label">
+                Threshold: {prescriptiveThresholdWeeks} weeks ({prescriptiveStats.thresholdDays} days)
+              </label>
+              <input
+                id="prescriptive-threshold"
+                className="hp-threshold-slider"
+                type="range"
+                min="1"
+                max="8"
+                step="1"
+                value={prescriptiveThresholdWeeks}
+                onChange={(event) => setPrescriptiveThresholdWeeks(Number(event.target.value))}
+              />
+              <div className="hp-prescriptive-bars">
+                <div className="hp-prescriptive-bar-row">
+                  <span className="hp-prescriptive-label">{prescriptiveThresholdWeeks}+ weeks</span>
+                  <div className="hp-prescriptive-bar-bg">
+                    <div
+                      className="hp-prescriptive-bar-fill long"
+                      style={{ width: `${Math.min(prescriptiveStats.longRate, 100)}%` }}
+                    />
+                  </div>
+                  <span className="hp-prescriptive-value">{prescriptiveStats.longRate.toFixed(1)}%</span>
+                </div>
+                <div className="hp-prescriptive-bar-row">
+                  <span className="hp-prescriptive-label">Under {prescriptiveThresholdWeeks} weeks</span>
+                  <div className="hp-prescriptive-bar-bg">
+                    <div
+                      className="hp-prescriptive-bar-fill short"
+                      style={{ width: `${Math.min(prescriptiveStats.shortRate, 100)}%` }}
+                    />
+                  </div>
+                  <span className="hp-prescriptive-value">{prescriptiveStats.shortRate.toFixed(1)}%</span>
+                </div>
+              </div>
+              <div className="hp-prescriptive-callout">
+                <strong>Suggested intervention:</strong>{' '}
+                {prescriptiveStats.relativeLift === null
+                  ? 'Not enough data to compare risk groups yet.'
+                  : `${prescriptiveStats.relativeLift.toFixed(1)}% higher cancellation risk for long-lead bookings. `}
+                {prescriptiveStats.sampleSize > 0 &&
+                  `Estimated avoidable cancellations at this threshold: ${prescriptiveStats.avoidableCancellations.toFixed(1)}.`}
+              </div>
+            </section>
           </div>
 
           <div className="hp-table-wrapper">

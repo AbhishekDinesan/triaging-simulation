@@ -308,7 +308,7 @@ function InstructorDashboard() {
           </section>
 
           <section className="settings-card historical-data-card">
-            <h2 className="settings-card-title">Historical Data &amp; Playground</h2>
+            <h2 className="settings-card-title">Historical Data</h2>
             <div className="simulation-toggle-container">
               <span
                 className={`status-indicator ${simulationSettings.historicalDataEnabled ? 'status-active' : 'status-inactive'}`}
