@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useRef } from 'react'
 import { format, startOfWeek, startOfMonth } from 'date-fns'
-import { useSimulationSettings } from '../context/SimulationSettingsContext'
+import { useSimulationSettings } from '../../simulation/SimulationSettingsContext'
 import { APPOINTMENT_TYPES, CONSTRAINTS } from '../utils/schedulingUtils'
 import './HistoryPlayground.css'
 
