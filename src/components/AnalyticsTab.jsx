@@ -254,7 +254,7 @@ function AnalyticsTab() {
       <div className="analytics-header">
         <div className="header-text">
           <h2>Clinic Analytics</h2>
-          <p>Descriptive analytics for intake, flow, cancellations, and scheduling capacity</p>
+          <p>Surface stress signals first, then investigate bottlenecks with descriptive analytics</p>
         </div>
         <div className="capacity-badge">
           <span className="capacity-label">Weekly Capacity</span>

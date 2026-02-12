@@ -80,7 +80,7 @@ function StudentPage() {
   const userLabel = isDemoMode ? 'Demo Student' : currentUser?.email
   const logoutLabel = isDemoMode ? 'Exit Demo' : 'Sign Out'
   const historicalDataEnabled = simulationSettings.historicalDataEnabled
-  const TABS = historicalDataEnabled ? [...BASE_TABS, { id: 'history', label: 'History & Playground' }] : BASE_TABS
+  const TABS = historicalDataEnabled ? [...BASE_TABS, { id: 'history', label: 'Historical Data' }] : BASE_TABS
 
   let currentTabContent
   if (activeTab === 'history' && historicalDataEnabled) {
