@@ -69,7 +69,7 @@ function LoginPage() {
       if (isRegistrationMode) {
         await registerUser(emailInput, passwordInput, selectedRole)
       } else {
-        await loginUser(emailInput, passwordInput, selectedRole)
+        await loginUser(emailInput, passwordInput)
         setUserRole(selectedRole)
       }
 

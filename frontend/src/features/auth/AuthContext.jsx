@@ -10,14 +10,9 @@ const DEMO_USERS = {
   instructor: { uid: 'demo-instructor', email: 'demo-instructor@example.com' },
 }
 
-const DEV_AUTH_BYPASS =
-  import.meta.env.DEV && String(import.meta.env.VITE_DEV_AUTH_BYPASS || '').toLowerCase() === 'true'
-
 function normalizeRole(role) {
   return role === 'instructor' ? 'instructor' : 'student'
 }
-
-const DEV_AUTH_DEFAULT_ROLE = normalizeRole(import.meta.env.VITE_DEV_AUTH_ROLE)
 
 export function useAuthContext() {
   const context = useContext(AuthContext)
@@ -33,20 +28,7 @@ export function AuthProvider({ children }) {
   const [authLoading, setAuthLoading] = useState(true)
   const [isDemoMode, setIsDemoMode] = useState(false)
 
-  function setBypassUser(role) {
-    const safeRole = normalizeRole(role)
-    setIsDemoMode(true)
-    setCurrentUser(DEMO_USERS[safeRole])
-    setUserRole(safeRole)
-    setAuthLoading(false)
-    return { user: DEMO_USERS[safeRole], role: safeRole, isDevBypass: true }
-  }
-
   async function registerUser(email, password, role) {
-    if (DEV_AUTH_BYPASS) {
-      return setBypassUser(role || DEV_AUTH_DEFAULT_ROLE)
-    }
-
     const userCredential = await createUserWithEmailAndPassword(firebaseAuth, email, password)
     await setDoc(doc(firestoreDatabase, 'users', userCredential.user.uid), {
       email: email,
@@ -57,11 +39,7 @@ export function AuthProvider({ children }) {
     return userCredential
   }
 
-  async function loginUser(email, password, roleOverride) {
-    if (DEV_AUTH_BYPASS) {
-      return setBypassUser(roleOverride || userRole || DEV_AUTH_DEFAULT_ROLE)
-    }
-
+  async function loginUser(email, password) {
     const userCredential = await signInWithEmailAndPassword(firebaseAuth, email, password)
     const userDocRef = doc(firestoreDatabase, 'users', userCredential.user.uid)
     const userDocSnap = await getDoc(userDocRef)
@@ -72,7 +50,7 @@ export function AuthProvider({ children }) {
   }
 
   function logoutUser() {
-    if (isDemoMode || DEV_AUTH_BYPASS) {
+    if (isDemoMode) {
       setCurrentUser(null)
       setUserRole(null)
       setIsDemoMode(false)
@@ -84,25 +62,22 @@ export function AuthProvider({ children }) {
   }
 
   function enterDemoMode(role) {
+    const safeRole = normalizeRole(role)
     setIsDemoMode(true)
-    setCurrentUser(DEMO_USERS[role])
-    setUserRole(role)
+    setCurrentUser(DEMO_USERS[safeRole])
+    setUserRole(safeRole)
     setAuthLoading(false)
   }
 
   function switchDemoRole(role) {
     if (isDemoMode) {
-      setCurrentUser(DEMO_USERS[role])
-      setUserRole(role)
+      const safeRole = normalizeRole(role)
+      setCurrentUser(DEMO_USERS[safeRole])
+      setUserRole(safeRole)
     }
   }
 
   useEffect(() => {
-    if (DEV_AUTH_BYPASS) {
-      setBypassUser(DEV_AUTH_DEFAULT_ROLE)
-      return () => {}
-    }
-
     const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
       setCurrentUser(user)
       if (user) {
@@ -124,7 +99,6 @@ export function AuthProvider({ children }) {
     userRole,
     authLoading,
     isDemoMode,
-    isAuthBypassed: DEV_AUTH_BYPASS,
     registerUser,
     loginUser,
     logoutUser,
