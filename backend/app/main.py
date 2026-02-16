@@ -14,6 +14,11 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 
+try:
+    from .history_sandbox import router as history_sandbox_router
+except ImportError:
+    from history_sandbox import router as history_sandbox_router
+
 app = FastAPI(title="Clinic Analytics API")
 
 # Vite dev server is typically :5173, while other local apps may run on :3000.
@@ -31,6 +36,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(history_sandbox_router)
 
 # ============================================================
 # INPUT FILE DISCOVERY

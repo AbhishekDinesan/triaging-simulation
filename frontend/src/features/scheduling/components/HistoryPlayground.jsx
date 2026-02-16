@@ -4,99 +4,139 @@ import { useSimulationSettings } from '../../simulation/SimulationSettingsContex
 import { APPOINTMENT_TYPES, CONSTRAINTS } from '../utils/schedulingUtils'
 import './HistoryPlayground.css'
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000'
+
 const CODE_SNIPPETS = [
   {
     label: 'Appointments per clinician',
-    code: `// Count appointments per clinician
-const counts = {};
-appointments.forEach(apt => {
-  const id = apt.clinicianId || 'Unknown';
-  counts[id] = (counts[id] || 0) + 1;
-});
-return counts;`,
+    code: `# Count appointments per clinician
+counts = {}
+for apt in appointments:
+    clinician_id = apt.get("clinicianId") or "Unknown"
+    counts[clinician_id] = counts.get(clinician_id, 0) + 1
+
+result = counts`,
   },
   {
     label: 'Cancellation rate',
-    code: `// Calculate cancellation rate
-const total = appointments.length;
-const cancelled = appointments.filter(a => {
-  const s = (a.status || '').toLowerCase();
-  return s.includes('cancel') || Boolean(a.cancelDatetime);
-}).length;
-return {
-  total,
-  cancelled,
-  rate: total ? (cancelled / total * 100).toFixed(1) + '%' : 'N/A'
-};`,
+    code: `# Calculate cancellation rate
+total = len(appointments)
+cancelled = 0
+for apt in appointments:
+    status = (apt.get("status") or "").lower()
+    if "cancel" in status or bool(apt.get("cancelDatetime")):
+        cancelled += 1
+
+result = {
+    "total": total,
+    "cancelled": cancelled,
+    "rate": (f"{(cancelled / total) * 100:.1f}%" if total else "N/A"),
+}`,
   },
   {
     label: 'Avg visits per client',
-    code: `// Average number of visits per client
-const byClient = {};
-appointments.forEach(a => {
-  byClient[a.clientId] = (byClient[a.clientId] || 0) + 1;
-});
-const clientIds = Object.keys(byClient);
-const avg = clientIds.length
-  ? (appointments.length / clientIds.length).toFixed(2)
-  : 0;
-return { totalVisits: appointments.length, uniqueClients: clientIds.length, avgVisitsPerClient: avg };`,
+    code: `# Average number of visits per client
+by_client = {}
+for apt in appointments:
+    client_id = apt.get("clientId")
+    by_client[client_id] = by_client.get(client_id, 0) + 1
+
+unique_clients = len(by_client)
+avg_visits = round(len(appointments) / unique_clients, 2) if unique_clients else 0
+
+result = {
+    "totalVisits": len(appointments),
+    "uniqueClients": unique_clients,
+    "avgVisitsPerClient": avg_visits,
+}`,
   },
   {
     label: 'Appointments by type',
-    code: `// Count appointments by type
-const byType = {};
-appointments.forEach(a => {
-  const t = a.appointmentType || 'Unknown';
-  byType[t] = (byType[t] || 0) + 1;
-});
-return byType;`,
+    code: `# Count appointments by type
+by_type = {}
+for apt in appointments:
+    apt_type = apt.get("appointmentType") or "Unknown"
+    by_type[apt_type] = by_type.get(apt_type, 0) + 1
+
+result = by_type`,
   },
   {
     label: 'Busiest day of the week',
-    code: `// Find the busiest day of the week
-const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const dayCounts = [0,0,0,0,0,0,0];
-appointments.forEach(a => {
-  const d = new Date(a.scheduledDate || a.scheduledStart);
-  if (!isNaN(d)) dayCounts[d.getDay()]++;
-});
-const result = dayNames.map((name, i) => ({ day: name, count: dayCounts[i] }));
-result.sort((a, b) => b.count - a.count);
-return result;`,
+    code: `# Find the busiest day of the week
+from datetime import datetime
+
+day_names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+day_counts = {name: 0 for name in day_names}
+
+for apt in appointments:
+    raw = apt.get("scheduledDate") or apt.get("scheduledStart")
+    if not raw:
+        continue
+    try:
+        dt = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except Exception:
+        continue
+    day_counts[day_names[dt.weekday()]] += 1
+
+result = sorted(
+    [{"day": day, "count": count} for day, count in day_counts.items()],
+    key=lambda x: x["count"],
+    reverse=True,
+)`,
   },
   {
     label: 'Client wait times (booking → scheduled)',
-    code: `// Calculate days between booking and scheduled date per client
-const waits = [];
-appointments.forEach(a => {
-  const booked = new Date(a.bookingDatetime);
-  const scheduled = new Date(a.scheduledDate || a.scheduledStart);
-  if (isNaN(booked) || isNaN(scheduled)) return;
-  const days = Math.round((scheduled - booked) / 86400000);
-  waits.push({ clientId: a.clientId, type: a.appointmentType, waitDays: days });
-});
-const avg = waits.length
-  ? (waits.reduce((s, w) => s + w.waitDays, 0) / waits.length).toFixed(1)
-  : 'N/A';
-return { averageWaitDays: avg, sampleRecords: waits.slice(0, 10) };`,
+    code: `# Calculate days between booking and scheduled date per client
+from datetime import datetime
+
+waits = []
+for apt in appointments:
+    booked_raw = apt.get("bookingDatetime")
+    scheduled_raw = apt.get("scheduledDate") or apt.get("scheduledStart")
+    if not booked_raw or not scheduled_raw:
+        continue
+    try:
+        booked = datetime.fromisoformat(booked_raw.replace("Z", "+00:00"))
+        scheduled = datetime.fromisoformat(scheduled_raw.replace("Z", "+00:00"))
+    except Exception:
+        continue
+    wait_days = (scheduled - booked).days
+    waits.append({
+        "clientId": apt.get("clientId"),
+        "type": apt.get("appointmentType"),
+        "waitDays": wait_days,
+    })
+
+average_wait = round(sum(item["waitDays"] for item in waits) / len(waits), 1) if waits else "N/A"
+result = {"averageWaitDays": average_wait, "sampleRecords": waits[:10]}`,
   },
 ]
 
-function runUserCode(code, appointments, clients, clinicians) {
+async function runUserCode(code, appointments, clients, clinicians) {
   try {
-    const fn = new Function(
-      'appointments',
-      'clients',
-      'clinicians',
-      'CONSTRAINTS',
-      `"use strict";
-${code}`
-    )
-    const result = fn(appointments, clients, clinicians, CONSTRAINTS)
-    return { ok: true, value: result }
+    const response = await fetch(`${API_BASE}/sandbox/history/python`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code,
+        appointments,
+        clients,
+        clinicians,
+        constraints: CONSTRAINTS,
+      }),
+    })
+
+    if (!response.ok) {
+      return { ok: false, error: `Request failed (${response.status})` }
+    }
+
+    const payload = await response.json()
+    if (!payload.ok) {
+      return { ok: false, error: payload.error || 'Python execution failed.' }
+    }
+    return { ok: true, value: payload.value }
   } catch (err) {
-    return { ok: false, error: err.message }
+    return { ok: false, error: err.message || 'Python execution failed.' }
   }
 }
 
@@ -146,6 +186,7 @@ function HistoryPlayground() {
   const [code, setCode] = useState(CODE_SNIPPETS[0].code)
   const [output, setOutput] = useState(null)
   const [outputError, setOutputError] = useState(null)
+  const [isRunning, setIsRunning] = useState(false)
   const textareaRef = useRef(null)
 
   const [activeSection, setActiveSection] = useState('timeline') // 'timeline' | 'playground'
@@ -224,8 +265,10 @@ function HistoryPlayground() {
     return sortAsc ? ' ▲' : ' ▼'
   }
 
-  const handleRun = useCallback(() => {
-    const result = runUserCode(code, appointments, allClients, clinicians)
+  const handleRun = useCallback(async () => {
+    setIsRunning(true)
+    const result = await runUserCode(code, appointments, allClients, clinicians)
+    setIsRunning(false)
     if (result.ok) {
       setOutput(result.value)
       setOutputError(null)
@@ -249,7 +292,7 @@ function HistoryPlayground() {
     }
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault()
-      handleRun()
+      void handleRun()
     }
   }
 
@@ -598,7 +641,7 @@ function HistoryPlayground() {
             <div>
               <h3>Code Playground</h3>
               <p>
-                Write JavaScript to analyze scheduling data. Available variables: <code>appointments</code>,{' '}
+                Write Python to analyze scheduling data. Available variables: <code>appointments</code>,{' '}
                 <code>clients</code>, <code>clinicians</code>, <code>CONSTRAINTS</code>.
               </p>
             </div>
@@ -627,8 +670,8 @@ function HistoryPlayground() {
             <div className="hp-pg-editor-pane">
               <div className="hp-pg-editor-header">
                 <span>Editor</span>
-                <button className="hp-run-btn" onClick={handleRun}>
-                  ▶ Run <span className="hp-run-shortcut">Ctrl+Enter</span>
+                <button className="hp-run-btn" onClick={() => void handleRun()} disabled={isRunning}>
+                  {isRunning ? 'Running...' : '▶ Run'} <span className="hp-run-shortcut">Ctrl+Enter</span>
                 </button>
               </div>
               <textarea
