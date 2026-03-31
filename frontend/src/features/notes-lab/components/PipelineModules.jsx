@@ -1,4 +1,5 @@
 import { Button, Card, Disclosure, Pill } from './ui'
+import WestfieldCaseLab from './WestfieldCaseLab'
 
 export default function PipelineModules({
   selectedNote,
@@ -209,6 +210,35 @@ export default function PipelineModules({
 GET /notes/evaluate/{job_id}
 -> { status, progress, results[], errors[] }`}</pre>
             </div>
+          </div>
+        </Disclosure>
+
+        <Disclosure title="Module 5 - Westfield Case: From Clinical Notes to Optimal Service Policies">
+          <div className="notes-module-grid full">
+            <div className="notes-panel-muted" style={{ marginBottom: '0.75rem' }}>
+              <div className="notes-panel-label">Learn</div>
+              <div className="notes-bullet-grid">
+                <p>
+                  <strong>Trajectory clustering</strong> groups children by how their cumulative progress unfolds over
+                  sessions, revealing distinct archetypes (rapid responders, gradual improvers, late bloomers, plateau cases).
+                </p>
+                <p>
+                  <strong>Newsvendor-style Q* optimization</strong> finds the reassessment session that maximizes expected
+                  sessions saved for each cluster, balancing early audits (which may miss progress) against late audits (which
+                  save fewer sessions).
+                </p>
+                <p>
+                  <strong>Waitlist projection</strong> applies predicted cluster membership to incoming referrals, estimating
+                  how many sessions the differentiated policy would free compared to a uniform T<sub>max</sub> baseline.
+                </p>
+                <p>
+                  This module implements Q2 and Q3 of the Westfield Children&apos;s Centre assignment: trajectory-based
+                  clustering with optimization, and predictive capacity planning from intake profiles.
+                </p>
+              </div>
+            </div>
+
+            <WestfieldCaseLab />
           </div>
         </Disclosure>
       </div>

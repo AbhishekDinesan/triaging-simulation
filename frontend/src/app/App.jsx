@@ -5,6 +5,8 @@ import LoginPage from '../features/auth/LoginPage'
 import StudentPage from '../features/student/StudentPage'
 import InstructorDashboard from '../features/instructor/InstructorDashboard'
 import NotesLabPage from '../features/notes-lab/NotesLabPage'
+import WestfieldCasePage from '../features/notes-lab/WestfieldCasePage'
+import ARIMALab from '../features/arima-lab/ARIMALab'
 import './App.css'
 
 function AuthLoadingScreen() {
@@ -71,6 +73,24 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <NotesLabPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/westfield-case"
+        element={
+          <ProtectedRoute>
+            <WestfieldCasePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/arima-lab"
+        element={
+          <ProtectedRoute>
+            <div style={{ maxWidth: '1100px', margin: '40px auto', padding: '0 20px' }}>
+              <ARIMALab />
+            </div>
           </ProtectedRoute>
         }
       />

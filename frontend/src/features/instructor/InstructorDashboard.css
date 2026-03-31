@@ -73,6 +73,11 @@
   border-color: white;
 }
 
+.notes-lab-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .logout-button {
   border: 2px solid rgba(255, 255, 255, 0.5);
   background: transparent;
@@ -171,6 +176,51 @@
   color: var(--text-secondary);
   margin-bottom: 1rem;
   line-height: 1.5;
+}
+
+.chapter-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.85rem;
+}
+
+.chapter-select {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.chapter-summary-box {
+  background: var(--bg-muted);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 0.9rem;
+}
+
+.chapter-summary-title {
+  display: block;
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.chapter-summary-box p {
+  margin: 0 0 0.45rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.chapter-summary-box small {
+  color: var(--text-muted);
+  font-size: 0.76rem;
 }
 
 .simulation-toggle-container {
@@ -693,6 +743,46 @@
 
 .seed-upload-button:disabled,
 .seed-clear-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mock-seed-actions {
+  margin-top: -0.25rem;
+}
+
+.mock-difficulty-select {
+  min-width: 180px;
+  padding: 0.8rem 0.85rem;
+  border: 1px solid var(--border-medium);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.mock-difficulty-select:focus {
+  outline: none;
+  border-color: var(--accent-teal);
+}
+
+.seed-generate-button {
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(30, 107, 92, 0.35);
+  border-radius: 12px;
+  background: var(--accent-teal);
+  color: white;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.seed-generate-button:hover:not(:disabled) {
+  background: var(--accent-teal-light);
+}
+
+.seed-generate-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }

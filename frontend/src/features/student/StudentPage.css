@@ -86,6 +86,33 @@
   border-color: var(--priority-low);
 }
 
+.westfield-case-button {
+  padding: 0.55rem 1.1rem;
+  border: 2px solid #e67e22;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(230, 126, 34, 0.15), rgba(243, 156, 18, 0.1));
+  color: #e67e22;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 8px rgba(230, 126, 34, 0.18);
+  animation: westfield-pulse 2.5s ease-in-out infinite;
+}
+
+.westfield-case-button:hover {
+  background: linear-gradient(135deg, rgba(230, 126, 34, 0.28), rgba(243, 156, 18, 0.2));
+  border-color: #d35400;
+  box-shadow: 0 0 14px rgba(230, 126, 34, 0.35);
+  transform: translateY(-1px);
+}
+
+@keyframes westfield-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(230, 126, 34, 0.18); }
+  50% { box-shadow: 0 0 16px rgba(230, 126, 34, 0.35); }
+}
+
 .notes-lab-button {
   padding: 0.5rem 1rem;
   border: 1px solid rgba(30, 107, 92, 0.35);
@@ -102,13 +129,180 @@
   border-color: var(--accent-teal);
 }
 
+.notes-lab-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .student-tabs {
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
   gap: 0.5rem;
   max-width: 1400px;
   margin: 0 auto;
   padding: 1rem 2rem 0;
   width: 100%;
+}
+
+.chapter-banner {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 0.5rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chapter-track {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chapter-upcoming-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 0.4rem;
+}
+
+.chapter-upcoming-box {
+  background: var(--bg-muted);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 0.5rem 0.55rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0.75;
+  min-height: 56px;
+}
+
+.upcoming-id {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.upcoming-title {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.chapter-kicker {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.chapter-banner strong {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.chapter-banner span {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.chapter-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  justify-self: end;
+}
+
+.chapter-nav-btn,
+.chapter-select {
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.chapter-nav-btn {
+  padding: 0.35rem 0.55rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.chapter-nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chapter-select {
+  padding: 0.3rem 0.42rem;
+  min-width: 128px;
+}
+
+.tab-strip {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.chapter-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chapter-guide-header h2 {
+  margin: 0 0 0.4rem;
+  color: var(--text-primary);
+}
+
+.chapter-guide-header p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.chapter-guide-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.chapter-guide-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+
+.chapter-guide-card h3 {
+  margin: 0 0 0.65rem;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.chapter-guide-card ul {
+  margin: 0;
+  padding-left: 1.15rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.chapter-guide-card li {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+.chapter-context-card p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.chapter-key-question {
+  margin-top: 0.7rem !important;
 }
 
 .tab-button {
@@ -163,9 +357,178 @@
   padding: 2rem;
   overflow-y: auto;
   min-height: 0;
+  width: 100%;
+}
+
+.student-content-shell {
+  flex: 1;
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 1rem;
+  align-items: start;
+}
+
+.student-agent-sidebar {
+  position: sticky;
+  top: 90px;
+  margin: 2rem 2rem 0 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  max-height: calc(100vh - 130px);
+}
+
+.agent-sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.agent-sidebar-header h3 {
+  margin: 0;
+  font-size: 0.96rem;
+  color: var(--text-primary);
+}
+
+.agent-sidebar-header p {
+  margin: 0.1rem 0 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.agent-robot-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(30, 107, 92, 0.45);
+  background: rgba(30, 107, 92, 0.1);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  place-items: center;
+  padding: 0.3rem 0.35rem 0.25rem;
+}
+
+.robot-eye {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-teal);
+}
+
+.robot-mouth {
+  grid-column: 1 / 3;
+  width: 14px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--accent-teal);
+}
+
+.agent-suggestion-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.agent-suggestion-row button {
+  border: 1px solid var(--border-medium);
+  border-radius: 999px;
+  background: var(--bg-muted);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  padding: 0.22rem 0.52rem;
+  cursor: pointer;
+}
+
+.agent-suggestion-row button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.agent-chat-log {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+
+.agent-chat-message {
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  background: var(--bg-muted);
+  padding: 0.5rem 0.58rem;
+}
+
+.agent-chat-message.user {
+  border-color: rgba(30, 107, 92, 0.45);
+  background: rgba(30, 107, 92, 0.08);
+}
+
+.agent-chat-message strong {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.15rem;
+}
+
+.agent-chat-message p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.79rem;
+  line-height: 1.35;
+}
+
+.agent-chat-message span {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.agent-chat-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.35rem;
+}
+
+.agent-chat-form input {
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.79rem;
+  padding: 0.48rem 0.56rem;
+}
+
+.agent-chat-form button {
+  border: 1px solid rgba(30, 107, 92, 0.4);
+  border-radius: 8px;
+  background: rgba(30, 107, 92, 0.1);
+  color: var(--accent-teal);
+  font-size: 0.76rem;
+  cursor: pointer;
+  padding: 0.42rem 0.62rem;
+}
+
+.agent-chat-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.agent-error {
+  margin: 0;
+  color: #d12f2f;
+  font-size: 0.75rem;
 }
 
 .student-footer {
@@ -436,6 +799,32 @@
     padding: 1rem 1rem 0;
   }
 
+  .chapter-banner {
+    width: 100%;
+  }
+
+  .chapter-track {
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .chapter-controls {
+    justify-self: start;
+  }
+
+  .chapter-upcoming-list {
+    width: 100%;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+
+  .chapter-upcoming-box {
+    min-height: 52px;
+  }
+
+  .chapter-guide-grid {
+    grid-template-columns: 1fr;
+  }
+
   .tab-button {
     flex: 1;
     justify-content: center;
@@ -448,6 +837,17 @@
 
   .student-main {
     padding: 1rem;
+  }
+
+  .student-content-shell {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .student-agent-sidebar {
+    position: static;
+    margin: 0 1rem 1rem;
+    max-height: none;
   }
 
   .intro-stage {
