@@ -291,7 +291,6 @@ function NotesLabPage() {
     try {
       await navigator.clipboard.writeText(prompt)
     } catch {
-      // no-op
     }
   }, [prompt])
 

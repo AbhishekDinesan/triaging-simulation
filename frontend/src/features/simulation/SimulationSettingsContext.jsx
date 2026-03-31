@@ -3,6 +3,7 @@ import { doc, onSnapshot, setDoc, collection, getDocs } from 'firebase/firestore
 import { addDays } from 'date-fns'
 import { firestoreDatabase } from '../../shared/firebase/firebaseConfig'
 import { NOTES_C0001, NOTES_C0004, NOTES_C0005 } from '../scheduling/data/samplePatientNotes'
+import { DEFAULT_CHAPTER_ID } from './chapters'
 
 const SimulationSettingsContext = createContext(null)
 
@@ -167,8 +168,11 @@ function generateSampleData() {
 
 const DEFAULT_SIMULATION_SETTINGS = {
   simulationEnabled: true,
+  simulationMode: 'scheduling',
+  simulationDifficulty: 'medium',
   clientDisplayMode: 'queue',
   historicalDataEnabled: false,
+  currentChapter: DEFAULT_CHAPTER_ID,
   priorityLevelsEnabled: {
     high: true,
     medium: true,
@@ -280,14 +284,20 @@ export function SimulationSettingsProvider({ children }) {
     const { clinicians: _, clientQueue: _cq, completedClients: _cc, appointments: _a, ...uiSettings } = newSettings
     const currentUISettings = {
       simulationEnabled: simulationSettings.simulationEnabled,
+      simulationMode: simulationSettings.simulationMode,
+      simulationDifficulty: simulationSettings.simulationDifficulty,
       clientDisplayMode: simulationSettings.clientDisplayMode,
       historicalDataEnabled: simulationSettings.historicalDataEnabled,
+      currentChapter: simulationSettings.currentChapter,
       priorityLevelsEnabled: simulationSettings.priorityLevelsEnabled,
     }
     const mergedUISettings = { ...currentUISettings, ...uiSettings }
-    await setDoc(settingsDocRef, mergedUISettings)
-
     setSimulationSettings((prev) => ({ ...prev, ...newSettings }))
+    try {
+      await setDoc(settingsDocRef, mergedUISettings)
+    } catch (error) {
+      console.error('Error updating simulation settings in Firestore:', error)
+    }
   }
 
   async function refreshFromFirestore() {
@@ -314,8 +324,11 @@ export function SimulationSettingsProvider({ children }) {
     const settingsDocRef = doc(firestoreDatabase, SETTINGS_DOCUMENT_PATH)
     const uiSettings = {
       simulationEnabled: true,
+      simulationMode: 'scheduling',
+      simulationDifficulty: 'medium',
       clientDisplayMode: 'queue',
       historicalDataEnabled: false,
+      currentChapter: DEFAULT_CHAPTER_ID,
       priorityLevelsEnabled: { high: true, medium: true, low: true },
     }
     await setDoc(settingsDocRef, uiSettings)

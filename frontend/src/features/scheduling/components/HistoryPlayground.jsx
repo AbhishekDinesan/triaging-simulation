@@ -189,7 +189,7 @@ function HistoryPlayground() {
   const [isRunning, setIsRunning] = useState(false)
   const textareaRef = useRef(null)
 
-  const [activeSection, setActiveSection] = useState('timeline') // 'timeline' | 'playground'
+  const [activeSection, setActiveSection] = useState('timeline')
 
   const historyRows = useMemo(() => {
     let rows = appointments.map((apt) => {

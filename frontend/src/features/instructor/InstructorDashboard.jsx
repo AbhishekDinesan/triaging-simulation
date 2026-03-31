@@ -2,8 +2,9 @@ import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthContext } from '../auth/AuthContext'
 import { useSimulationSettings } from '../simulation/SimulationSettingsContext'
+import { SIMULATION_CHAPTERS, getChapterById } from '../simulation/chapters'
 import { getCycleInfo, APPOINTMENT_TYPES, CONSTRAINTS } from '../scheduling/utils/schedulingUtils'
-import { seedDatabaseFromCSV, clearDatabase } from '../scheduling/utils/seedDatabase'
+import { seedDatabaseFromCSV, clearDatabase, seedMockDataByDifficulty } from '../scheduling/utils/seedDatabase'
 import './InstructorDashboard.css'
 
 const DISPLAY_MODES = [
@@ -17,6 +18,25 @@ const DISPLAY_MODES = [
     label: 'Stack View',
     description: 'One client at a time',
   },
+]
+
+const SIMULATION_MODES = [
+  {
+    id: 'scheduling',
+    label: 'Scheduling',
+    description: 'Client-by-client appointment scheduling workflow.',
+  },
+  {
+    id: 'capacity-planning',
+    label: 'Capacity Planning',
+    description: 'Weekly capacity strategy simulation focused on demand vs throughput.',
+  },
+]
+
+const DIFFICULTY_OPTIONS = [
+  { id: 'easy', label: 'Easy', description: 'Lower volatility and fewer disruptions.' },
+  { id: 'medium', label: 'Medium', description: 'Balanced baseline difficulty.' },
+  { id: 'hard', label: 'Hard', description: 'Higher demand pressure and disruptions.' },
 ]
 
 function formatPriorityLabel(priorityLevel) {
@@ -50,6 +70,10 @@ function InstructorDashboard() {
   const clientQueue = simulationSettings.clientQueue || []
   const completedClients = simulationSettings.completedClients || []
   const priorityLevelsEnabled = simulationSettings.priorityLevelsEnabled || {}
+  const simulationMode = simulationSettings.simulationMode || 'scheduling'
+  const simulationDifficulty = simulationSettings.simulationDifficulty || 'medium'
+  const currentChapter = Number(simulationSettings.currentChapter) || 1
+  const chapterInfo = getChapterById(currentChapter)
 
   const currentCycleInfo = getCycleInfo(new Date())
   const totalAppointments = simulationSettings.appointments?.length || 0
@@ -118,7 +142,13 @@ function InstructorDashboard() {
   }
 
   function handleOpenNotesLab() {
+    if (simulationMode !== 'scheduling' || !chapterInfo.notesLabEnabled) return
     navigate('/notes-lab')
+  }
+
+  async function handleChapterChange(event) {
+    const selectedChapter = Number(event.target.value)
+    await updateSimulationSettings({ currentChapter: selectedChapter })
   }
 
   async function handleToggleSimulation() {
@@ -133,6 +163,24 @@ function InstructorDashboard() {
     setIsSaving(true)
     await updateSimulationSettings({
       historicalDataEnabled: !simulationSettings.historicalDataEnabled,
+    })
+    setIsSaving(false)
+  }
+
+  async function handleSimulationModeChange(nextMode) {
+    if (nextMode === simulationMode) return
+    setIsSaving(true)
+    await updateSimulationSettings({
+      simulationMode: nextMode,
+    })
+    setIsSaving(false)
+  }
+
+  async function handleSimulationDifficultyChange(nextDifficulty) {
+    if (nextDifficulty === simulationDifficulty) return
+    setIsSaving(true)
+    await updateSimulationSettings({
+      simulationDifficulty: nextDifficulty,
     })
     setIsSaving(false)
   }
@@ -228,6 +276,24 @@ function InstructorDashboard() {
     setIsSeeding(false)
   }
 
+  async function handleGenerateMockData() {
+    setIsSeeding(true)
+    setSeedingLogs([])
+    setSeedingStatus(`Generating ${simulationDifficulty} mock dataset...`)
+
+    try {
+      const result = await seedMockDataByDifficulty(simulationDifficulty, appendSeedingLog)
+      setSeedingStatus(
+        `Complete! Generated ${simulationDifficulty} dataset with ${result.clients} clients, ${result.clinicians} clinicians, ${result.visits} visits`
+      )
+      await refreshFromFirestore()
+    } catch (error) {
+      setSeedingStatus(`Error: ${error.message}`)
+    }
+
+    setIsSeeding(false)
+  }
+
   const seedingStatusClassName = [
     'seeding-status',
     seedingStatus.includes('Complete') ? 'success' : '',
@@ -260,8 +326,16 @@ function InstructorDashboard() {
                 Switch to Student
               </button>
             )}
-            <button className="notes-lab-button" onClick={handleOpenNotesLab}>
-              Notes Lab
+            <button
+              className="notes-lab-button"
+              onClick={handleOpenNotesLab}
+              disabled={simulationMode !== 'scheduling' || !chapterInfo.notesLabEnabled}
+            >
+              {simulationMode !== 'scheduling'
+                ? 'Notes Lab (Scheduling Mode Only)'
+                : chapterInfo.notesLabEnabled
+                  ? 'Notes Lab'
+                  : 'Notes Lab (Ch 6+)'}
             </button>
             <span className="user-email">{isDemoMode ? 'Demo Instructor' : currentUser?.email}</span>
             <button className="logout-button" onClick={handleLogout}>
@@ -302,9 +376,49 @@ function InstructorDashboard() {
             </div>
             <p className="settings-description">
               {simulationSettings.simulationEnabled
-                ? 'Students can currently access and use the scheduling simulation.'
+                ? 'Students can currently access the selected simulation mode.'
                 : 'Students are currently blocked from accessing the simulation.'}
             </p>
+          </section>
+
+          <section className="settings-card">
+            <h2 className="settings-card-title">Simulation Mode</h2>
+            <p className="settings-description">
+              Choose whether students work in the original scheduling simulator or the new capacity-planning problem.
+            </p>
+            <div className="display-mode-toggle">
+              {SIMULATION_MODES.map((mode) => (
+                <button
+                  key={mode.id}
+                  className={`mode-option ${simulationMode === mode.id ? 'mode-active' : ''}`}
+                  onClick={() => handleSimulationModeChange(mode.id)}
+                  disabled={isSaving}
+                >
+                  <span className="mode-label">{mode.label}</span>
+                  <span className="mode-desc">{mode.description}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="settings-card">
+            <h2 className="settings-card-title">Simulation Difficulty</h2>
+            <p className="settings-description">
+              Applies to scheduling mock-data generation and capacity-planning simulation behavior.
+            </p>
+            <div className="display-mode-toggle">
+              {DIFFICULTY_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  className={`mode-option ${simulationDifficulty === option.id ? 'mode-active' : ''}`}
+                  onClick={() => handleSimulationDifficultyChange(option.id)}
+                  disabled={isSaving}
+                >
+                  <span className="mode-label">{option.label}</span>
+                  <span className="mode-desc">{option.description}</span>
+                </button>
+              ))}
+            </div>
           </section>
 
           <section className="settings-card historical-data-card">
@@ -328,6 +442,28 @@ function InstructorDashboard() {
                 ? 'Students can view historical scheduling data and use the interactive code playground to perform their own analytics.'
                 : 'Enable to give students access to historical scheduling records and an interactive analytics playground.'}
             </p>
+          </section>
+
+          <section className="settings-card chapter-settings-card">
+            <h2 className="settings-card-title">Chapter Progression</h2>
+            <p className="settings-description">
+              Use chapter mode to align the student experience with your curriculum flow.
+            </p>
+            <label className="chapter-label">
+              Active Chapter
+              <select className="chapter-select" value={currentChapter} onChange={handleChapterChange}>
+                {SIMULATION_CHAPTERS.map((chapter) => (
+                  <option key={chapter.id} value={chapter.id}>
+                    Chapter {chapter.id}: {chapter.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="chapter-summary-box">
+              <span className="chapter-summary-title">{chapterInfo.title}</span>
+              <p>{chapterInfo.summary}</p>
+              <small>{chapterInfo.keyQuestion}</small>
+            </div>
           </section>
 
           <section className="settings-card">
@@ -517,6 +653,22 @@ function InstructorDashboard() {
               </button>
               <button className="seed-clear-button" onClick={handleClearDatabase} disabled={isSeeding}>
                 Clear All Data
+              </button>
+            </div>
+
+            <div className="seed-actions mock-seed-actions">
+              <select
+                className="mock-difficulty-select"
+                value={simulationDifficulty}
+                onChange={(event) => handleSimulationDifficultyChange(event.target.value)}
+                disabled={isSeeding || isSaving}
+              >
+                <option value="easy">Easy mock data</option>
+                <option value="medium">Medium mock data</option>
+                <option value="hard">Hard mock data</option>
+              </select>
+              <button className="seed-generate-button" onClick={handleGenerateMockData} disabled={isSeeding}>
+                {isSeeding ? 'Generating...' : 'Generate Mock Data'}
               </button>
             </div>
 
